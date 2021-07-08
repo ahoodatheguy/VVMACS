@@ -1,0 +1,125 @@
+#+TITLE:VVMACS Configuration
+
+
+* MELPA
+MELPA is a package repository for emacs that allows it to use the most popular emacs packages. The following code will add it to Emacs. 
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+#+END_SRC
+* UI
+** Startup UI
+*** Disable Startup Message
+Disables the default GNU Emacs startup message. This will be replaced with the dashboard package.
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t)
+#+END_SRC
+*** Dashboard
+This emacs package serves as a better alternative for the standard emacs startup message.
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :ensure t
+  :config
+  (setq dashboard-set-file-icons t)
+	(setq dashboard-startup-banner 'logo)
+  (dashboard-setup-startup-hook))
+#+END_SRC
+** Modeline
+The Doom-Modeline package is from Doom Emacs. It displays useful information such as filename, encoding, and even email notifications.
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode))
+#+END_SRC
+** Disable Toolbar/Menubar/Scrollbar
+*** Toolbar
+While the toolbar is helpful, most things it offers can be replaced with keybinds.
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+#+END_SRC
+*** Menubar
+Same with the menubar.
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+#+END_SRC
+*** Scrollbar
+Scrollbars are nice, but it's a waste of space.
+#+BEGIN_SRC emacs-lisp
+(scroll-bar-mode -1)
+#+END_SRC
+** Default Font
+#+BEGIN_SRC emacs-lisp
+(set-frame-font "FiraMono Nerd Font-18" nil t)
+#+END_SRC
+** Themes
+The default emacs theme is boring, and most importantly, it doesn't have a dark mode. So lets solve both those problems.
+*** Doom-Themes
+The doom-themes package is a collection of popular themes.
+#+BEGIN_SRC emacs-lisp
+(use-package doom-themes)
+#+END_SRC
+*** Set Default Themes
+Downloading themes means nothing if you can't actually use them, so set them with load-theme.
+#+BEGIN_SRC emacs-lisp
+(load-theme 'doom-snazzy t)
+#+END_SRC
+** Ivy Mode
+Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich colors.
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :diminish
+    :config
+    (ivy-mode 1))
+#+END_SRC
+** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+  :defer t
+  :bind (("C-s" . counsel-grep-or-swiper)))
+#+END_SRC
+** Centaur Tabs
+#+BEGIN_SRC emacs-lisp
+  (use-package centaur-tabs
+        :demand
+        :config
+         (centaur-tabs-mode t)                       ; Enable Centaur Tabs
+         (setq centaur-tabs-set-icons t)             ; Enable Icons
+         (setq centaur-tabs-gray-out-icons t)        ; Gray Out Inactive Tabs
+         (setq centaur-tabs-set-bar 'left)           ; Line to the left of tab
+         (setq centaur-tabs-set-modified-marker t)   ; Adds mark to tab when buffer is editied.
+        :hook
+         (dashboard-setup-startup-hook . centaur-tabs-local-mode)
+         (dashboard-mode . centaur-tabs-local-mode)
+                :bind
+                ("C-<tab>" . centaur-tabs-forward))
+#+END_SRC
+** Rainbow Delimeters
+Sometimes it's hard to tell which parentheases are paired to which. Rainbow delimeters gives each parenthasee their own colors to help differentiate them.
+
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+* Evil Mode
+This is for vim users, it enables Vim keybindings in emacs. If you ever need to use default Emacs keybindings for some reason, you can toggle emacs mode with Ctrl + Z.
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :ensure t
+    :init
+     (evil-mode))
+#+END_SRC
+** Undo-Tree
+In order to fully make use of Evil mode, the undo-package is installed.
+#+BEGIN_SRC emacs-lisp
+(use-package undo-tree
+:after evil
+:config (global-undo-tree-mode 1))
+#+END_SRC
+* Keys
+** Escape Key Escapes
+The escape key doesn't really work in emacs, if you accidentally open a menu you're basically stuck in it. The following code will quit most menus when ESC is pressed.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+
