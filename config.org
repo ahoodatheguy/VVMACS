@@ -1,6 +1,5 @@
 #+TITLE:VVMACS Configuration
 
-
 * MELPA
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
 #+BEGIN_SRC emacs-lisp
@@ -8,7 +7,7 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 #+END_SRC
-* UI
+* Appearance
 ** Startup UI
 *** Disable Startup Message
 Disables the default GNU Emacs startup message. This will be replaced with the dashboard package.
@@ -18,15 +17,16 @@ Disables the default GNU Emacs startup message. This will be replaced with the d
 *** Dashboard
 This emacs package serves as a better alternative for the standard emacs startup message.
 #+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-      :ensure t
-      :config
-      (setq dashboard-set-file-icons t)
-      (setq dashboard-startup-banner 'logo)
-      (setq dashboard-set-heading-icons t)
-      (dashboard-setup-startup-hook)
-      (setq dashboard-items '((recents  . 5)
-      (bookmarks . 5))))
+    (use-package dashboard
+        :ensure t
+        :config
+        (setq dashboard-set-file-icons t)
+        (setq dashboard-startup-banner 'logo)
+        (setq dashboard-set-heading-icons t)
+        (dashboard-setup-startup-hook)
+        (setq dashboard-items '((recents  . 5)
+                                (bookmarks . 5)
+                                (projects . 5))))
 #+END_SRC
 ** Modeline
 The Doom-Modeline package is from Doom Emacs. It displays useful information such as filename, encoding, and even email notifications.
@@ -76,26 +76,29 @@ Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich
     (ivy-mode 1))
 #+END_SRC
 ** Swiper
+Swiper is a fuzzy finding search tool to find text within buffers. Think of this like a better Ctrl+F.
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
   :defer t
   :bind (("C-s" . swiper)))
 #+END_SRC
 ** Centaur Tabs
+In VSCode tabs are shown as a good way to organize code windows. A useful package named centaur-tabs adds this functionality to emacs.
 #+BEGIN_SRC emacs-lisp
-  (use-package centaur-tabs
-        :demand
-        :config
+(use-package centaur-tabs
+      :demand
+      :config
          (centaur-tabs-mode t)                       ; Enable Centaur Tabs
          (setq centaur-tabs-set-icons t)             ; Enable Icons
          (setq centaur-tabs-gray-out-icons t)        ; Gray Out Inactive Tabs
          (setq centaur-tabs-set-bar 'left)           ; Line to the left of tab
          (setq centaur-tabs-set-modified-marker t)   ; Adds mark to tab when buffer is editied.
-        :hook
+         (setq centaur-tabs-modified-marker "•")
+       :hook
          (dashboard-setup-startup-hook . centaur-tabs-local-mode)
          (dashboard-mode . centaur-tabs-local-mode)
-                :bind
-                ("C-<tab>" . centaur-tabs-forward))
+      :bind
+         ("C-<tab>" . centaur-tabs-forward))
 #+END_SRC
 ** Rainbow Delimeters
 Sometimes it's hard to tell which parentheases are paired to which. Rainbow delimeters gives each parenthasee their own colors to help differentiate them.
@@ -155,15 +158,18 @@ Vim has a very useful function called leader keys which are allow for (in my opi
 In Emacs the package for leader keys is called general.el.
 #+BEGIN_SRC emacs-lisp
 (use-package general
-    :after evil
-    :config
-     (general-create-definer vvgeneral/magit-keys
-    :keymaps '(normal)
-    :prefix "SPC")
-    (general-create-definer vvgeneral/buffer-keys
-    :keymaps '(normal)
-    :prefix "SPC")
- )
+  :after evil
+  :config
+   (general-create-definer vvgeneral/magit-keys
+  :keymaps '(normal)
+  :prefix "SPC")
+  (general-create-definer vvgeneral/buffer-keys
+  :keymaps '(normal)
+  :prefix "SPC")
+  (general-create-definer vvgeneral/projectile-keys
+  :keymaps '(normal)
+  :prefix "SPC")
+)
 #+END_SRC
 ** Git Shortcuts
 General used with magit allows for operating extremely fast. The leader key for git operations in this configuration is SPC-g.
@@ -183,7 +189,12 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
      "bk"  '(kill-current-buffer :which-key "Kill active buffer")
      "br"  '(rename-buffer :which-key "Rename active buffer"))
 #+END_SRC
-
+** Projectile Shortcuts
+This ones pretty simple because projectile has it's own shortcut menu.
+#+BEGIN_SRC emacs-lisp
+(vvgeneral/projectile-keys
+    "pr" '(projectile-command-map :which-key "projectile commands"))
+#+END_SRC
 * Split Navigation
 In emacs you use split buffers when you often when you need to reference something. Instead of using our mouse, lets configure our split navigation in a Vim-like way.
 #+BEGIN_SRC emacs-lisp
@@ -233,21 +244,29 @@ While we're at it, let's make the headers a more "professional" font instead of 
 
 And finally add some finishing touches by editing Org Mode itself.
 #+BEGIN_SRC emacs-lisp
-  (defun vv/org-setup ()
-	  (org-indent-mode)
-	  (visual-line-mode t)
-	  (setq evil-auto-indent nil)
-	  (setq org-src-ask-before-returning-to-edit-buffer nil))
-  (use-package org
-    :hook (org-mode . vv/org-setup)
-    :config
-   (setq org-ellipsis " ⤵")
-   (setq org-support-shift-select t)
-   (setq org-src-tab-acts-natively t))
+(defun vv/org-setup ()
+         (org-indent-mode)
+         (visual-line-mode t)
+         (setq evil-auto-indent nil)
+         (setq org-src-ask-before-returning-to-edit-buffer nil))
+(use-package org
+   :hook (org-mode . vv/org-setup)
+   :config
+  (setq org-ellipsis " ⤵")
+  (setq org-support-shift-select t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-startup-folded t))
 #+END_SRC
 
 * Backup Files
 Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
+#+END_SRC
+* Projectile
+Projectile is a neat Emacs package for managing projects.
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :defer t
+    :config (projectile-mode))
 #+END_SRC
