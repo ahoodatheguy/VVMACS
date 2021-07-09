@@ -53,7 +53,7 @@ Scrollbars are nice, but it's a waste of space.
 #+END_SRC
 ** Default Font
 #+BEGIN_SRC emacs-lisp
-(set-frame-font "FiraMono Nerd Font-18" nil t)
+(set-frame-font "Fira Code-18" nil t)
 #+END_SRC
 ** Themes
 The default Emacs theme is boring, and most importantly, it doesn't have a dark mode. So lets solve both those problems.
@@ -78,9 +78,13 @@ Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich
 ** Swiper
 Swiper is a fuzzy finding search tool to find text within buffers. Think of this like a better Ctrl+F.
 #+BEGIN_SRC emacs-lisp
-  (use-package swiper
-  :defer t
-  :bind (("C-s" . swiper)))
+      (use-package swiper
+      :defer t)
+
+  (if (equal system-type 'darwin)
+ (global-set-key (kbd "s-f") 'swiper)
+ (global-set-key (kbd "C-s") 'swiper))
+
 #+END_SRC
 ** Centaur Tabs
 In VSCode tabs are shown as a good way to organize code windows. A useful package named centaur-tabs adds this functionality to emacs.
@@ -152,6 +156,12 @@ Emacs has a lot of keybindings, to the point where it can be hard to track. To s
 The escape key doesn't really work in Emacs, if you accidentally open a menu you're basically stuck in it. The following code will quit most menus when ESC is pressed.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+* Save Key
+Instead of using C-x C-s, lets configure Emacs to use the standard binding. C-s.
+#+BEGIN_SRC emacs-lisp
+  (if (equal system-type 'darwin)
+    (global-set-key (kbd "s-s") 'save-buffer))
 #+END_SRC
 * General Keybindings
 Vim has a very useful function called leader keys which are allow for (in my opinion) more reasonable keybindings.
