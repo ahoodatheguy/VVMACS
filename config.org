@@ -334,3 +334,14 @@ I also like to code with exclusivley tabs for my indentation. So I'm going to se
     (setq python-indent 4)
     (setq tab-width 4)))
 #+END_SRC
+* macOS
+Mac users may experience difficulties with Emacs from $PATH issues to lack of command-key usage.
+** $PATH fixes
+lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a lot.
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+    :ensure t)
+(if (equal system-type 'darwin)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)))
+#+END_SRC
