@@ -18,12 +18,15 @@ Disables the default GNU Emacs startup message. This will be replaced with the d
 *** Dashboard
 This emacs package serves as a better alternative for the standard emacs startup message.
 #+BEGIN_SRC emacs-lisp
-(use-package dashboard
-  :ensure t
-  :config
-  (setq dashboard-set-file-icons t)
-	(setq dashboard-startup-banner 'logo)
-  (dashboard-setup-startup-hook))
+  (use-package dashboard
+      :ensure t
+      :config
+      (setq dashboard-set-file-icons t)
+      (setq dashboard-startup-banner 'logo)
+      (setq dashboard-set-heading-icons t)
+      (dashboard-setup-startup-hook)
+      (setq dashboard-items '((recents  . 5)
+      (bookmarks . 5))))
 #+END_SRC
 ** Modeline
 The Doom-Modeline package is from Doom Emacs. It displays useful information such as filename, encoding, and even email notifications.
@@ -137,7 +140,7 @@ Emacs has a lot of keybindings, to the point where it can be hard to track. To s
   (setq which-key-idle-delay 0.3))
 #+END_SRC
 * Git Integration
-Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
+  Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :defer t)
@@ -195,13 +198,13 @@ Ask anyone what pops into their head when they think of Emacs and what would the
 
 First, lets install Org Superstar, a super helpful package that adds things like bullet points, icons, and titles.
 #+BEGIN_SRC emacs-lisp
-(use-package org-superstar
-    :defer t
-    :hook (org-mode . org-superstar-mode)
-    :config
-    (org-superstar-configure-like-org-bullets)
-    (setq inhibit-compacting-font-caches t)
-    (setq org-hidden-keywords '(title)))
+  (use-package org-superstar
+      :defer t
+      :hook (org-mode . org-superstar-mode)
+      :config
+      (org-superstar-configure-like-org-bullets)
+      (setq inhibit-compacting-font-caches t)
+      (setq org-hidden-keywords '(title)))
 #+END_SRC
 
 Second, lets put some margins on Org Mode so it looks like a real document.
@@ -226,4 +229,25 @@ While we're at it, let's make the headers a more "professional" font instead of 
   (org-level-7 . 1.1)
   (org-level-8 . 1.1)))
 (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face)))
+#+END_SRC
+
+And finally add some finishing touches by editing Org Mode itself.
+#+BEGIN_SRC emacs-lisp
+  (defun vv/org-setup ()
+	  (org-indent-mode)
+	  (visual-line-mode t)
+	  (setq evil-auto-indent nil)
+	  (setq org-src-ask-before-returning-to-edit-buffer nil))
+  (use-package org
+    :hook (org-mode . vv/org-setup)
+    :config
+   (setq org-ellipsis " ⤵")
+   (setq org-support-shift-select t)
+   (setq org-src-tab-acts-natively t))
+#+END_SRC
+
+* Backup Files
+Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
 #+END_SRC
