@@ -228,6 +228,7 @@ In emacs you use split buffers when you often when you need to reference somethi
 Ask anyone what pops into their head when they think of Emacs and what would they say? Org Mode! Unfortunately, the default Org Mode is a bit, lackluster. So let's fix that.
 
 First, lets install Org Superstar, a super helpful package that adds things like bullet points, icons, and titles.
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-superstar
       :defer t
@@ -237,7 +238,10 @@ First, lets install Org Superstar, a super helpful package that adds things like
       (setq inhibit-compacting-font-caches t)
       (setq org-hidden-keywords '(title)))
 #+END_SRC
+
+
 Second, lets put some margins on Org Mode so it looks like a real document.
+
 #+BEGIN_SRC emacs-lisp
 (defun vv/org-mode-visual-fill ()
    (setq visual-fill-column-width 100
@@ -247,7 +251,10 @@ Second, lets put some margins on Org Mode so it looks like a real document.
    :defer t
    :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
-While we're at it, let's make the headers a more "professional" font instead of something that looks like it came out of some weird hackerman terminal.
+
+While we're at it, let's make the headers a more "professional" font instead of something that
+looks like it came out of some weird hackerman terminal.
+
 #+BEGIN_SRC emacs-lisp
 (dolist (face '((org-level-1 . 1.2)
   (org-level-2 . 1.1)
@@ -259,7 +266,9 @@ While we're at it, let's make the headers a more "professional" font instead of 
   (org-level-8 . 1.1)))
 (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face)))
 #+END_SRC
+
 In my opinion, Org Mode is supposed to be a clean, minimal way of outlining. So I'm going to remove line numbers for Org mode as well as terminal modes.
+
 #+BEGIN_SRC emacs-lisp
 (dolist (mode '(org-mode-hook
     term-mode-hook
@@ -267,7 +276,9 @@ In my opinion, Org Mode is supposed to be a clean, minimal way of outlining. So 
     shell-mode-hook))
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
+
 And finally add some finishing touches by editing Org Mode itself.
+
 #+BEGIN_SRC emacs-lisp
 (defun vv/org-setup ()
          (org-indent-mode)
@@ -301,6 +312,13 @@ Projectile is a neat Emacs package for managing projects.
     :ensure t
     :defer t
     :config (projectile-mode))
+#+END_SRC
+* Highlighting
+Most editors are configured to delete any text that is highlighted with the Shift key after another key is pressed.
+Emacs however, doesn't work like this, but fret not, for it can be configured to.
+
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
 #+END_SRC
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
@@ -341,14 +359,23 @@ I personally code in python. So I'll be installing a langauge server for it. If 
             (require 'lsp-pyright)
             (lsp-deferred))))  ; or lsp-deferred
 #+END_SRC
-I also like to code with exclusivley tabs for my indentation. So I'm going to set that up here.
+I also like to code with exclusivley tabs for my indentation. So I'm going to set that up here along with some other neat settings.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook
     (lambda ()
       (setq indent-tabs-mode t)
       (setq python-indent 4)
       (setq tab-width 4)
-      (toggle-truncate-lines t)))
+      (toggle-truncate-lines t)
+      (electric-pair-mode 1)))
+#+END_SRC
+** Term Mode
+Running programs in terminals is very useful for running and debugging code. Unfortunately the term mode in Emacs is a bit outdated. Most unicode icons don't really work well, so lets change the encoding to fix that.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'term-exec-hook
+          (function
+           (lambda ()
+             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 #+END_SRC
 * macOS
 Mac users may experience difficulties with Emacs from $PATH issues to lack of command-key usage.
