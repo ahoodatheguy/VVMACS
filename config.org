@@ -2,7 +2,7 @@
 
 
 * MELPA
-MELPA is a package repository for emacs that allows it to use the most popular emacs packages. The following code will add it to Emacs. 
+MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
 #+BEGIN_SRC emacs-lisp
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -53,7 +53,7 @@ Scrollbars are nice, but it's a waste of space.
 (set-frame-font "FiraMono Nerd Font-18" nil t)
 #+END_SRC
 ** Themes
-The default emacs theme is boring, and most importantly, it doesn't have a dark mode. So lets solve both those problems.
+The default Emacs theme is boring, and most importantly, it doesn't have a dark mode. So lets solve both those problems.
 *** Doom-Themes
 The doom-themes package is a collection of popular themes.
 #+BEGIN_SRC emacs-lisp
@@ -76,7 +76,7 @@ Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
   :defer t
-  :bind (("C-s" . counsel-grep-or-swiper)))
+  :bind (("C-s" . swiper)))
 #+END_SRC
 ** Centaur Tabs
 #+BEGIN_SRC emacs-lisp
@@ -96,18 +96,18 @@ Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich
 #+END_SRC
 ** Rainbow Delimeters
 Sometimes it's hard to tell which parentheases are paired to which. Rainbow delimeters gives each parenthasee their own colors to help differentiate them.
-
 #+BEGIN_SRC emacs-lisp
-(use-package rainbow-delimiters
-:hook (prog-mode . rainbow-delimiters-mode))
+  (use-package rainbow-delimiters
+  :defer t
+  :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 * Evil Mode
-This is for vim users, it enables Vim keybindings in emacs. If you ever need to use default Emacs keybindings for some reason, you can toggle emacs mode with Ctrl + Z.
+This is for vim users, it enables Vim keybindings in Emacs. If you ever need to use default Emacs keybindings for some reason, you can toggle emacs mode with Ctrl + Z.
 #+BEGIN_SRC emacs-lisp
-  (use-package evil
-    :ensure t
-    :init
-     (evil-mode))
+(use-package evil
+   :ensure t
+   :init
+   (evil-mode))
 #+END_SRC
 ** Undo-Tree
 In order to fully make use of Evil mode, the undo-package is installed.
@@ -116,10 +116,114 @@ In order to fully make use of Evil mode, the undo-package is installed.
 :after evil
 :config (global-undo-tree-mode 1))
 #+END_SRC
-* Keys
-** Escape Key Escapes
-The escape key doesn't really work in emacs, if you accidentally open a menu you're basically stuck in it. The following code will quit most menus when ESC is pressed.
+Now we have to bind the vim undo keys to the undo-tree functions.
+#+BEGIN_SRC emacs-lisp
+(define-key evil-normal-state-map "u" 'undo-tree-undo)
+(define-key evil-normal-state-map (kbd "C-r") 'undo-tree-redo)
+#+END_SRC
+** Tab Navigation
+Vim has a very unique way of cycling through tabs. Porting them to Emacs can be done in two lines.
+#+BEGIN_SRC emacs-lisp
+(define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
+(define-key evil-normal-state-map (kbd "g T") 'centaur-tabs-backward)
+#+End_SRC
+* Which-Key
+Emacs has a lot of keybindings, to the point where it can be hard to track. To solve this problem we use which-key. A package which shows a HUD type feature that displays what keybinds you are about to use.
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :init
+  (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+#+END_SRC
+* Git Integration
+Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :defer t)
+#+END_SRC
+* Escape Key Escapes
+The escape key doesn't really work in Emacs, if you accidentally open a menu you're basically stuck in it. The following code will quit most menus when ESC is pressed.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
+* General Keybindings
+Vim has a very useful function called leader keys which are allow for (in my opinion) more reasonable keybindings.
+In Emacs the package for leader keys is called general.el.
+#+BEGIN_SRC emacs-lisp
+(use-package general
+    :after evil
+    :config
+     (general-create-definer vvgeneral/magit-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+    (general-create-definer vvgeneral/buffer-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+ )
+#+END_SRC
+** Git Shortcuts
+General used with magit allows for operating extremely fast. The leader key for git operations in this configuration is SPC-g.
+#+BEGIN_SRC emacs-lisp
+(vvgeneral/magit-keys
+  "g" '(:ignore t :which-key "magit shortcuts")
+  "gs" '(magit-status :which-key "git status")
+  "gb" '(magit-branch :which-key "git branch actions")
+)
+#+END_SRC
+** Buffer Shortcuts
+Buffer management in Emacs isn't really the most friendly out of the box. The keybindings are confusing and difficult to execute. Let's fix that with general leader keys.
+#+BEGIN_SRC emacs-lisp
+ (vvgeneral/buffer-keys
+     "b" '(:ignore t :which-key "buffer shortcuts")
+     "bs"  '(counsel-switch-buffer :which-key "Switch active buffer")
+     "bk"  '(kill-current-buffer :which-key "Kill active buffer")
+     "br"  '(rename-buffer :which-key "Rename active buffer"))
+#+END_SRC
 
+* Split Navigation
+In emacs you use split buffers when you often when you need to reference something. Instead of using our mouse, lets configure our split navigation in a Vim-like way.
+#+BEGIN_SRC emacs-lisp
+(define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+(define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+(define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
+(define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
+#+END_SRC
+
+* Org Mode Configuration
+Ask anyone what pops into their head when they think of Emacs and what would they say? Org Mode! Unfortunately, the default Org Mode is a bit, lackluster. So let's fix that.
+
+First, lets install Org Superstar, a super helpful package that adds things like bullet points, icons, and titles.
+#+BEGIN_SRC emacs-lisp
+(use-package org-superstar
+    :defer t
+    :hook (org-mode . org-superstar-mode)
+    :config
+    (org-superstar-configure-like-org-bullets)
+    (setq inhibit-compacting-font-caches t)
+    (setq org-hidden-keywords '(title)))
+#+END_SRC
+
+Second, lets put some margins on Org Mode so it looks like a real document.
+#+BEGIN_SRC emacs-lisp
+(defun vv/org-mode-visual-fill ()
+   (setq visual-fill-column-width 100
+   visual-fill-column-center-text t)
+   (visual-fill-column-mode 1))
+(use-package visual-fill-column
+   :defer t
+   :hook (org-mode . vv/org-mode-visual-fill))
+#+END_SRC
+
+While we're at it, let's make the headers a more "professional" font instead of something that looks like it came out of some weird hackerman terminal.
+#+BEGIN_SRC emacs-lisp
+(dolist (face '((org-level-1 . 1.2)
+  (org-level-2 . 1.1)
+  (org-level-3 . 1.05)
+  (org-level-4 . 1.0)
+  (org-level-5 . 1.1)
+  (org-level-6 . 1.1)
+  (org-level-7 . 1.1)
+  (org-level-8 . 1.1)))
+(set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face)))
+#+END_SRC
