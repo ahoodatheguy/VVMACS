@@ -83,7 +83,7 @@ Swiper is a fuzzy finding search tool to find text within buffers. Think of this
 
   (if (equal system-type 'darwin)
  (global-set-key (kbd "s-f") 'swiper)
- (global-set-key (kbd "C-s") 'swiper))
+ (global-set-key (kbd "C-f") 'swiper))
 
 #+END_SRC
 ** Centaur Tabs
@@ -160,8 +160,10 @@ The escape key doesn't really work in Emacs, if you accidentally open a menu you
 * Save Key
 Instead of using C-x C-s, lets configure Emacs to use the standard binding. C-s.
 #+BEGIN_SRC emacs-lisp
-  (if (equal system-type 'darwin)
-    (global-set-key (kbd "s-s") 'save-buffer))
+(if (equal system-type 'darwin)
+  (global-set-key (kbd "s-s") 'save-buffer)
+  (global-set-key (kbd "C-s") 'save-buffer)
+  )
 #+END_SRC
 * General Keybindings
 Vim has a very useful function called leader keys which are allow for (in my opinion) more reasonable keybindings.
@@ -273,10 +275,62 @@ Emacs periodically creates backup files. The problem is they get in the way of y
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
 #+END_SRC
+Emacs also creates lockfiles. Files that start and end with a #. You can also get rid of these. 90% of the time, you don't need these. So VVMacs disables it.
+#+BEGIN_SRC emacs-lisp
+(setq create-lockfiles nil)
+#+END_SRC
 * Projectile
 Projectile is a neat Emacs package for managing projects.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
+    :ensure t
     :defer t
     :config (projectile-mode))
+#+END_SRC
+* Development
+Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
+** Autocomplete
+What's a good code editor without autocomplete? Fortunately, emacs has a package called company for this very purpose.
+#+BEGIN_SRC emacs-lisp
+(use-package company
+   :after lsp-mode
+   :ensure t
+   :defer t
+   :hook (lsp-mode . company-mode)
+   :custom
+   (company-minimum-prefix-length 1)
+   (company-idle-delay 0.0)
+   :bind (:map company-active-map
+            ("<tab>" . company-complete-selection)))
+#+END_SRC
+** Language Server
+But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+    :ensure t
+    :defer t
+    :commands (lsp lsp-deferred)
+    :config
+        (setq lsp-keymap-prefix "C-c l")
+    :config
+        (lsp-enable-which-key-integration t))
+#+END_SRC
+** Python
+I personally code in python. So I'll be installing a langauge server for it. If you don't, you can look at the lsp-mode documentation for servers for your preffered language.
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-pyright
+    :defer t
+    :ensure t
+    :hook (python-mode . (lambda ()
+            (require 'lsp-pyright)
+            (lsp-deferred))))  ; or lsp-deferred
+#+END_SRC
+I also like to code with exclusivley tabs for my indentation. So I'm going to set that up here.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook
+  (lambda ()
+    (setq indent-tabs-mode t)
+    (setq python-indent 4)
+    (setq tab-width 4)))
 #+END_SRC
