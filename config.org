@@ -131,10 +131,12 @@ Downloading themes means nothing if you can't actually use them, so set them wit
 * Evil Mode
 This is for vim users, it enables Vim keybindings in Emacs. If you ever need to use default Emacs keybindings for some reason, you can toggle emacs mode with Ctrl + Z.
 #+BEGIN_SRC emacs-lisp
-(use-package evil
-   :ensure t
-   :init
-   (evil-mode))
+  (use-package evil
+     :ensure t
+     :init
+     (evil-mode)
+     :config
+     (evil-set-undo-system 'undo-tree))
 #+END_SRC
 ** Undo-Tree
 In order to fully make use of Evil mode, the undo-package is installed.
@@ -142,11 +144,6 @@ In order to fully make use of Evil mode, the undo-package is installed.
 (use-package undo-tree
 :after evil
 :config (global-undo-tree-mode 1))
-#+END_SRC
-Now we have to bind the vim undo keys to the undo-tree functions.
-#+BEGIN_SRC emacs-lisp
-(define-key evil-normal-state-map "u" 'undo-tree-undo)
-(define-key evil-normal-state-map (kbd "C-r") 'undo-tree-redo)
 #+END_SRC
 ** Tab Navigation
 Vim has a very unique way of cycling through tabs. Porting them to Emacs can be done in two lines.
@@ -239,7 +236,6 @@ First, lets install Org Superstar, a super helpful package that adds things like
       (setq org-hidden-keywords '(title)))
 #+END_SRC
 
-
 Second, lets put some margins on Org Mode so it looks like a real document.
 
 #+BEGIN_SRC emacs-lisp
@@ -277,24 +273,31 @@ In my opinion, Org Mode is supposed to be a clean, minimal way of outlining. So 
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
-And finally add some finishing touches by editing Org Mode itself.
+Not everyone uses Emacs however, so we can use ox-pandoc to convert our org mode files into more standard formats like PDF or Markdown.
 
 #+BEGIN_SRC emacs-lisp
-(defun vv/org-setup ()
-         (org-indent-mode)
-         (visual-line-mode t)
-         (setq evil-auto-indent nil)
-         (setq org-src-ask-before-returning-to-edit-buffer nil))
-(use-package org
-   :hook (org-mode . vv/org-setup)
-   :config
-  (setq org-ellipsis " ⤵")
-  (setq org-hide-emphasis-markers t)
-  (setq org-support-shift-select t)
-  (setq org-src-tab-acts-natively t)
-  (setq org-startup-folded t)
-(setq org-startup-indented t
-      org-src-tab-acts-natively t))
+(use-package ox-pandoc
+    :defer t)
+#+END_SRC
+
+And finally add some finishing touches by editing Org Mode itself.
+
+ #+BEGIN_SRC emacs-lisp
+  (defun vv/org-setup ()
+           (org-indent-mode)
+           (visual-line-mode t)
+           (setq evil-auto-indent nil)
+           (setq org-src-ask-before-returning-to-edit-buffer nil))
+  (use-package org
+     :hook (org-mode . vv/org-setup)
+     :config
+    (setq org-ellipsis " ⤵")
+    (setq org-hide-emphasis-markers t)
+    (setq org-support-shift-select t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-startup-folded t)
+  (setq org-startup-indented t
+        org-src-tab-acts-natively t))
 #+END_SRC
 * Backup Files
 Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
