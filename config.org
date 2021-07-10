@@ -72,27 +72,9 @@ Swiper is a fuzzy finding search tool to find text within buffers. Think of this
       :defer t)
 
   (if (equal system-type 'darwin)
- (global-set-key (kbd "s-f") 'swiper)
- (global-set-key (kbd "C-f") 'swiper))
+ (global-set-key (kbd "s-f") 'counsel-grep-or-swiper)
+ (global-set-key (kbd "C-f") 'counsel-grep-or-swiper))
 
-#+END_SRC
-** Centaur Tabs
-In VSCode tabs are shown as a good way to organize code windows. A useful package named centaur-tabs adds this functionality to emacs.
-#+BEGIN_SRC emacs-lisp
-(use-package centaur-tabs
-      :demand
-      :config
-         (centaur-tabs-mode t)                       ; Enable Centaur Tabs
-         (setq centaur-tabs-set-icons t)             ; Enable Icons
-         (setq centaur-tabs-gray-out-icons t)        ; Gray Out Inactive Tabs
-         (setq centaur-tabs-set-bar 'left)           ; Line to the left of tab
-         (setq centaur-tabs-set-modified-marker t)   ; Adds mark to tab when buffer is editied.
-         (setq centaur-tabs-modified-marker "•")
-       :hook
-         (dashboard-setup-startup-hook . centaur-tabs-local-mode)
-         (dashboard-mode . centaur-tabs-local-mode)
-      :bind
-         ("C-<tab>" . centaur-tabs-forward))
 #+END_SRC
 ** Which-Key
 Emacs has a lot of keybindings, to the point where it can be hard to track. To solve this problem we use which-key. A package which shows a HUD type feature that displays what keybinds you are about to use.
@@ -145,12 +127,6 @@ In order to fully make use of Evil mode, the undo-package is installed.
 :after evil
 :config (global-undo-tree-mode 1))
 #+END_SRC
-** Tab Navigation
-Vim has a very unique way of cycling through tabs. Porting them to Emacs can be done in two lines.
-#+BEGIN_SRC emacs-lisp
-(define-key evil-normal-state-map (kbd "g t") 'centaur-tabs-forward)
-(define-key evil-normal-state-map (kbd "g T") 'centaur-tabs-backward)
-#+End_SRC
 * Git Integration
   Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
 #+BEGIN_SRC emacs-lisp
