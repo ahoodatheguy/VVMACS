@@ -37,22 +37,6 @@ The Doom-Modeline package is from Doom Emacs. It displays useful information suc
   :config
   (setq doom-modeline-env-python-executable "python"))
 #+END_SRC
-** Disable Toolbar/Menubar/Scrollbar
-*** Toolbar
-While the toolbar is helpful, most things it offers can be replaced with keybinds.
-#+begin_src emacs-lisp
-(tool-bar-mode -1)
-#+END_SRC
-*** Menubar
-Same with the menubar.
-#+begin_src emacs-lisp
-(menu-bar-mode -1)
-#+END_SRC
-*** Scrollbar
-Scrollbars are nice, but it's a waste of space.
-#+begin_src emacs-lisp
-(scroll-bar-mode -1)
-#+END_SRC
 ** Text Only Quit Messages
 When you attempt to quit Emacs while you have unsaved changes open, Emacs opens a quite annoying popup message asking if you want to save before you quit. This is helpful, but on tiling window managers it's a bit of an issue as the messages will show up tiled like a normal window.
 
@@ -325,14 +309,14 @@ What's a good code editor without autocomplete? Fortunately, emacs has a package
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
 #+begin_src emacs-lisp
-(use-package lsp-mode
-    :ensure t
-    :defer t
-    :commands (lsp lsp-deferred)
-    :config
-        (setq lsp-keymap-prefix "C-c l")
-    :config
-        (lsp-enable-which-key-integration t))
+  (use-package lsp-mode
+      :ensure t
+      :defer t
+      :commands (lsp lsp-deferred)
+      :config
+          (setq lsp-keymap-prefix "C-c l")
+      :config
+          (lsp-enable-which-key-integration t))
 #+END_SRC
 ** Python
 I personally code in python. So I'll be installing a langauge server for it. If you don't, you can look at the lsp-mode documentation for servers for your preffered language.
