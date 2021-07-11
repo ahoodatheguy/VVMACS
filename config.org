@@ -53,6 +53,14 @@ Scrollbars are nice, but it's a waste of space.
 #+BEGIN_SRC emacs-lisp
 (scroll-bar-mode -1)
 #+END_SRC
+** Text Only Quit Messages
+When you attempt to quit Emacs while you have unsaved changes open, Emacs opens a quite annoying popup message asking if you want to save before you quit. This is helpful, but on tiling window managers it's a bit of an issue as the messages will show up tiled like a normal window.
+
+Instead, lets make all of our messages appear in the mini-buffer
+
+#+BEGIN_SRC emacs-lisp
+(setq use-dialog-box nil)
+#+END_SRC
 ** Default Font
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Fira Code-18" nil t)
@@ -128,7 +136,7 @@ In order to fully make use of Evil mode, the undo-package is installed.
 :config (global-undo-tree-mode 1))
 #+END_SRC
 * Git Integration
-  Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
+Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :defer t)
