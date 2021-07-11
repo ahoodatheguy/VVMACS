@@ -280,8 +280,7 @@ And finally add some finishing touches by editing Org Mode itself.
    (setq org-support-shift-select t)
    (setq org-src-tab-acts-natively t)
    (setq org-startup-folded t)
-   (setq org-startup-indented t
-    org-src-tab-acts-natively t))
+   (setq org-startup-indented t))
 #+END_SRC
 * Backup Files
 Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
@@ -375,6 +374,17 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 #+END_SRC
+* YASnippet
+If you've ever written a LaTeX document, you've probably experienced the monotony of writing a preamble. It can be quite annoying to have to repeatedly declare the packages you want to use for every single document.
+Unfortunately, writing boilerplate is not a problem unique to LaTeX. Fortunately, this is fixable with YASnippet.
+[[https://www.youtube.com/watch?v=W-bRZlseNm0][Watch a YASnippet tutorial here.]]
+
+#+begin_src emacs-lisp
+(use-package yasnippet
+:config
+    (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+    (yas-global-mode 1))
+#+end_src
 * Prettify Symbols
 Prettify symbols is an easy way to integrate icons into your writing without actually messing up the contents of the file.
 
@@ -399,9 +409,10 @@ Here icons are added to cover up some of orgs keywords like src blocks.
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 (add-hook 'org-mode-hook 'org-icons)
 #+END_SRC
-
 * Afterword
 And there you have it! VVMacs is fully configured! Of course, thats not the end of your Emacs journey. Want to start programming in a language other than python? Add your own [[https://emacs-lsp.github.io/lsp-mode/][language server!]] Want to integrate email into your emacs config? Try out [[https://www.emacswiki.org/emacs/mu4e][m4ue!]] There is no limit to the insane capabilities of GNU Emacs (you can even make it your [[https://github.com/ch11ng/exwm][window manager]]).
 
 
 Special thanks to [[https://www.youtube.com/channel/UCAiiOTio8Yu69c3XnR7nQBQ][System Crafters]] and the [[https://www.emacswiki.org/][EmacsWiki.]]
+
+

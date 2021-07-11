@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: Notes Boilerplate
+# key: N
+# --
+
+#+TITLE:${1:Subject}
+#+DATE: `(format-time-string "%Y-%m-%d")`
+
+
+$0
