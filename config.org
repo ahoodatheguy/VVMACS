@@ -1,16 +1,27 @@
 #+TITLE:VVMACS Configuration
+#+STARTUP: hideblocks
 
-* MELPA
+* Introduction
+Emacs is a *not* a text editor, it is a fully featured enviroment for Elisp code. It just happens to be able to edit text. As such, it allows for customization and extensibility far beyond the likes of VSCode and even Vim.
+
+However, one of the biggest downsides of emacs is it's steep learning curve, the language used to customize Emacs is difficult and it's syntax is quite strange. This makes Emacs quite daunting to new users, who'd rather stick with their limiting toolkit rather than spend weeks or months learning Emacs.
+
+This config aims to ease the transition for new users looking to join the Church of Emacs by changing the annoying features and adding the ones that most people looking to start using Emacs would want, while remaining lightweight and straightforward enough to not seem daunting to new users.
+
+But one of the best parts of this configuration for new users is the fact that it is written in Org Mode, the Markdown-like file format native to Emacs. This allows for detailed explanations of each tweak and package installed along with an easy way to navigate the file.
+** MELPA
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
 #+begin_src emacs-lisp
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 #+end_src
+** EmacsWiki
+The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to cusotmize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
 * Appearance
 ** Startup UI
 *** Disable Startup Message
-Disables the default GNU Emacs startup message. This will be replaced with the dashboard package.
+Disables the default GNU Emacs startup message. This will be replaced with a separate package.
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 #+end_src
@@ -29,7 +40,7 @@ This emacs package serves as a better alternative for the standard emacs startup
                             (projects . 5))))
 #+end_src
 ** Modeline
-The Doom-Modeline package is from Doom Emacs. It displays useful information such as filename, encoding, and even email notifications.
+The ~doom-modeline~ package is from Doom Emacs. It displays useful information such as the filename, encoding, and even email notifications.
 #+begin_src emacs-lisp
 (use-package doom-modeline
   :ensure t
@@ -49,8 +60,8 @@ Instead, lets make all of our messages appear in the mini-buffer
 #+begin_src emacs-lisp
 (set-frame-font "Fira Code-18" nil t)
 #+END_SRC
-** Ivy Mode
-Ivy Mode allows for better looking menus. Along with fuzzy autocomplete and rich colors.
+** Ivy
+~ivy~ is a completion framework that is used in the menu's like ~M-x~. It boasts such features as Ctrl-F like-search, rich colors, and autocomplete.
 #+begin_src emacs-lisp
 (use-package ivy
   :diminish
@@ -69,7 +80,7 @@ Swiper is a fuzzy finding search tool to find text within buffers. Think of this
 
 #+END_SRC
 ** Which-Key
-Emacs has a lot of keybindings, to the point where it can be hard to track. To solve this problem we use which-key. A package which shows a HUD type feature that displays what keybinds you are about to use.
+Emacs has a lot of keybindings, to the point where it can be hard to track. To solve this problem we use ~which-key~. A package which shows a HUD type feature that displays what keybinds you are about to use.
 #+begin_src emacs-lisp
 (use-package which-key
   :init
@@ -78,7 +89,7 @@ Emacs has a lot of keybindings, to the point where it can be hard to track. To s
   (setq which-key-idle-delay 0.3))
 #+END_SRC
 ** Rainbow Delimeters
-Sometimes it's hard to tell which parentheases are paired to which. Rainbow delimeters gives each parenthasee their own colors to help differentiate them.
+Sometimes it's hard to tell which parentheases are paired to which. ~rainbow-delimiters~ gives each parenthasee their own colors to help differentiate them.
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
     :defer t
@@ -93,12 +104,12 @@ Line numbers are helpful when debugging code.
 ** Themes
 The default Emacs theme is boring, and most importantly, it doesn't have a dark mode. So lets solve both those problems.
 *** Doom-Themes
-The doom-themes package is a collection of popular themes.
+The ~doom-themes~ package is a collection of popular themes.
 #+begin_src emacs-lisp
 (use-package doom-themes)
 #+END_SRC
 *** Set Default Themes
-Downloading themes means nothing if you can't actually use them, so set them with load-theme.
+Downloading themes means nothing if you can't actually use them, so set them with ~load-theme~.
 #+begin_src emacs-lisp
 (load-theme 'doom-snazzy t)
 #+END_SRC
@@ -113,34 +124,37 @@ This is for vim users, it enables Vim keybindings in Emacs. If you ever need to 
    (evil-set-undo-system 'undo-tree))
 #+end_src
 ** Undo-Tree
-In order to fully make use of Evil mode, the undo-package is installed.
+In order to fully make use of Evil mode, the ~undo-tree~ package is installed.
 #+begin_src emacs-lisp
 (use-package undo-tree
     :after evil
     :config (global-undo-tree-mode 1))
 #+END_SRC
-* Git Integration
-Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the magit package to bring the Git protocol to emacs.
-#+begin_src emacs-lisp
-(use-package magit
-  :defer t)
-#+END_SRC
-* Escape Key Escapes
+* Keys
+One of the biggest issues with Emacs is it's awful keybindings. It's so bad that the [[https://www.emacswiki.org/emacs/RepeatedStrainInjury][Emacs wiki]] has a dedicated page on avoiding RSI while using Emacs. As such, this section is designed to bring more "user-friendly" keybinds to Emacs.
+** Escape Key Escapes
 The escape key doesn't really work in Emacs, if you accidentally open a menu you're basically stuck in it. The following code will quit most menus when ESC is pressed.
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
-* Save Key
-Instead of using C-x C-s, lets configure Emacs to use the standard binding. C-s.
+** Save Key
+Instead of using ~C-x C-s~, lets configure Emacs to use the standard binding. ~C-s~.
 #+begin_src emacs-lisp
 (if (equal system-type 'darwin)
-  (global-set-key (kbd "s-s") 'save-buffer)
+  (global-set-key (kbd "s-s") 'save-buffer)     ;; macOS save key ⌘
   (global-set-key (kbd "C-s") 'save-buffer)
-  )
+)
 #+END_SRC
-* General Keybindings
+** Select All Key
+Like the save key, most editors allow for selecting all of the text in a window with Ctrl a. But emacs doesn't do that, but fret not, because we can still add it thanks to the extreme customizability of Emacs.
+#+begin_src emacs-lisp
+(if (equal system-type 'darwin)
+    (define-key evil-insert-state-map (kbd "s-a") 'mark-whole-buffer)    ;; macOS save key ⌘
+    (define-key evil-insert-state-map (kbd "C-a") 'mark-whole-buffer))
+#+end_src
+** General.el
 Vim has a very useful function called leader keys which are allow for (in my opinion) more reasonable keybindings.
-In Emacs the package for leader keys is called general.el.
+In Emacs the package for leader keys is called ~general.el~.
 #+begin_src emacs-lisp
 (use-package general
   :after evil
@@ -148,15 +162,15 @@ In Emacs the package for leader keys is called general.el.
    (general-create-definer vvgeneral/magit-keys
   :keymaps '(normal)
   :prefix "SPC")
-  (general-create-definer vvgeneral/buffer-keys
+   (general-create-definer vvgeneral/buffer-keys
   :keymaps '(normal)
   :prefix "SPC")
-  (general-create-definer vvgeneral/projectile-keys
+   (general-create-definer vvgeneral/projectile-keys
   :keymaps '(normal)
   :prefix "SPC")
 )
 #+END_SRC
-** Git Shortcuts
+*** Git Shortcuts
 General used with magit allows for operating extremely fast. The leader key for git operations in this configuration is SPC-g.
 #+begin_src emacs-lisp
 (vvgeneral/magit-keys
@@ -165,7 +179,7 @@ General used with magit allows for operating extremely fast. The leader key for 
   "gb" '(magit-branch :which-key "git branch actions")
 )
 #+END_SRC
-** Buffer Shortcuts
+*** Buffer Shortcuts
 Buffer management in Emacs isn't really the most friendly out of the box. The keybindings are confusing and difficult to execute. Let's fix that with general leader keys.
 #+begin_src emacs-lisp
  (vvgeneral/buffer-keys
@@ -174,26 +188,24 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
      "bk"  '(kill-current-buffer :which-key "Kill active buffer")
      "br"  '(rename-buffer :which-key "Rename active buffer"))
 #+END_SRC
-** Projectile Shortcuts
+*** Projectile Shortcuts
 This ones pretty simple because projectile has it's own shortcut menu.
 #+begin_src emacs-lisp
 (vvgeneral/projectile-keys
     "pr" '(projectile-command-map :which-key "projectile commands"))
 #+END_SRC
 * Split Navigation
-In emacs you use split buffers when you often when you need to reference something. Instead of using our mouse, lets configure our split navigation in a Vim-like way.
+In emacs you use split buffers when you often when you need to reference something in another document Instead of using our mouse, lets configure our split navigation in a Vim-like way.
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
 (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
 (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
 (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
 #+END_SRC
-
 * Org Mode Configuration
 Ask anyone what pops into their head when they think of Emacs and what would they say? Org Mode! Unfortunately, the default Org Mode is a bit, lackluster. So let's fix that.
-
-First, lets install Org Superstar, a super helpful package that adds things like bullet points, icons, and titles.
-
+** Org Superstar
+First, lets install ~org-superstar~, a super helpful package that adds things like bullet points, icons, and titles.
 #+begin_src emacs-lisp
 (use-package org-superstar
     :defer t
@@ -201,12 +213,11 @@ First, lets install Org Superstar, a super helpful package that adds things like
     :config
     (org-superstar-configure-like-org-bullets)
     (setq inhibit-compacting-font-caches t)
-    (setq org-superstar-headline-bullets-list '("●" "—" "❍"))
+    (setq org-superstar-headline-bullets-list '("●" "—" "+"))
     (setq org-hidden-keywords '(title)))
 #+END_SRC
-
+** Margins
 Second, lets put some margins on Org Mode so it looks like a real document.
-
 #+begin_src emacs-lisp
 (defun vv/org-mode-visual-fill ()
    (setq visual-fill-column-width 100
@@ -216,9 +227,8 @@ Second, lets put some margins on Org Mode so it looks like a real document.
    :defer t
    :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
-
+** Header Font
 While we're at it, let's make the headers font a bit more "professional" font instead of something that looks like it came out of some weird hackerman terminal.
-
 #+begin_src emacs-lisp
 (dolist (face '((org-level-1 . 1.2)
   (org-level-2 . 1.1)
@@ -230,9 +240,8 @@ While we're at it, let's make the headers font a bit more "professional" font in
   (org-level-8 . 1.1)))
 (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face)))
 #+END_SRC
-
+** Line Numbers
 In my opinion, Org Mode is supposed to be a clean, minimal way of outlining. So I'm going to remove line numbers for Org mode as well as terminal modes.
-
 #+begin_src emacs-lisp
 (dolist (mode '(org-mode-hook
     term-mode-hook
@@ -240,16 +249,16 @@ In my opinion, Org Mode is supposed to be a clean, minimal way of outlining. So 
     shell-mode-hook))
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
+** Org-Pandoc
+Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
 
-Not everyone uses Emacs however, so we can use ox-pandoc to convert our org mode files into more standard formats like PDF or Markdown.
-
+(Note: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
 #+begin_src emacs-lisp
 (use-package ox-pandoc
     :defer t)
 #+END_SRC
-
-And finally add some finishing touches by editing Org Mode itself.
-
+** Org Package
+And finally add some finishing touches by configuring the Org Mode package itself.
  #+begin_src emacs-lisp
   (defun vv/org-setup ()
            (org-indent-mode)
@@ -266,34 +275,10 @@ And finally add some finishing touches by editing Org Mode itself.
    (setq org-startup-folded t)
    (setq org-startup-indented t))
 #+END_SRC
-* Backup Files
-Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
-#+begin_src emacs-lisp
-(setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
-#+END_SRC
-Emacs also creates lockfiles. Files that start and end with a #. You can also get rid of these. 90% of the time, you don't need these. So VVMacs disables it.
-#+begin_src emacs-lisp
-(setq create-lockfiles nil)
-#+END_SRC
-* Projectile
-Projectile is a neat Emacs package for managing projects.
-#+begin_src emacs-lisp
-(use-package projectile
-  :ensure t
-  :defer t
-  :config (projectile-mode))
-#+END_SRC
-* Highlighting
-Most editors are configured to delete any text that is highlighted with the Shift key after another key is pressed.
-Emacs however, doesn't work like this, but fret not, for it can be configured to.
-
-#+begin_src emacs-lisp
-(delete-selection-mode 1)
-#+END_SRC
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
-What's a good code editor without autocomplete? Fortunately, emacs has a package called company for this very purpose.
+What's a good code editor without autocomplete? Fortunately, emacs has a package called ~company~ for this very purpose.
 #+begin_src emacs-lisp
 (use-package company
    :after lsp-mode
@@ -309,18 +294,17 @@ What's a good code editor without autocomplete? Fortunately, emacs has a package
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-      :ensure t
-      :defer t
-      :commands (lsp lsp-deferred)
-      :config
-          (setq lsp-keymap-prefix "C-c l")
-      :config
-          (lsp-enable-which-key-integration t))
+(use-package lsp-mode
+    :ensure t
+    :defer t
+    :commands (lsp lsp-deferred)
+    :config
+        (setq lsp-keymap-prefix "C-c l")
+    :config
+        (lsp-enable-which-key-integration t))
 #+END_SRC
 ** Python
 I personally code in python. So I'll be installing a langauge server for it. If you don't, you can look at the lsp-mode documentation for servers for your preffered language.
-
 #+begin_src emacs-lisp
 (use-package lsp-pyright
     :defer t
@@ -329,7 +313,7 @@ I personally code in python. So I'll be installing a langauge server for it. If 
             (require 'lsp-pyright)
             (lsp-deferred))))  ; or lsp-deferred
 #+END_SRC
-I also like to code with exclusivley tabs for my indentation. So I'm going to set that up here along with some other neat settings.
+I also like to code with tabs exclusivley for my indentation. So I'm going to set that up here along with some other neat settings.
 #+begin_src emacs-lisp
 (add-hook 'python-mode-hook
   (lambda ()
@@ -340,16 +324,46 @@ I also like to code with exclusivley tabs for my indentation. So I'm going to se
     (electric-pair-mode 1)))
 #+END_SRC
 ** Term Mode
-Running programs in terminals is very useful for running and debugging code. Unfortunately the term mode in Emacs is a bit outdated. Most unicode icons don't really work well, so lets change the encoding to fix that.
+Running programs in terminals is very useful for running and debugging code. Unfortunately the terminal in Emacs is a bit outdated. Most unicode icons don't really work well, so lets change the encoding to fix that.
 #+begin_src emacs-lisp
 (add-hook 'term-exec-hook
           (function
            (lambda ()
              (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 #+END_SRC
-* macOS
+** Git Integration
+Git is one of the most important tools for developers, chances are you've downloaded this distro from a git repo. We can use the ~magit~ package to bring the Git protocol to emacs.
+#+begin_src emacs-lisp
+(use-package magit
+  :defer t)
+#+END_SRC
+** Projectile
+~projectile~ is a neat Emacs package for managing projects.
+#+begin_src emacs-lisp
+(use-package projectile
+  :ensure t
+  :defer t
+  :config (projectile-mode))
+#+END_SRC
+* Misc
+** Backup Files
+Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
+#+begin_src emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
+#+END_SRC
+Emacs also creates lockfiles. Files that start and end with a #. You can also get rid of these. 90% of the time, you don't need these. So VVMacs disables it.
+#+begin_src emacs-lisp
+(setq create-lockfiles nil)
+#+END_SRC
+** Delete Highlighted Text
+Most editors are configured to delete any text that is highlighted with the Shift key after another key is pressed.
+Emacs however, doesn't work like this, but fret not, for it can be configured to.
+#+begin_src emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
+** macOS Fixes
 Mac users may experience difficulties with Emacs from $PATH issues to lack of command-key usage.
-** $PATH fixes
+*** $PATH fixes
 lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a lot.
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
@@ -358,19 +372,8 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 #+END_SRC
-* YASnippet
-If you've ever written a LaTeX document, you've probably experienced the monotony of writing a preamble. It can be quite annoying to have to repeatedly declare the packages you want to use for every single document.
-Unfortunately, writing boilerplate is not a problem unique to LaTeX. Fortunately, this is fixable with YASnippet.
-[[https://www.youtube.com/watch?v=W-bRZlseNm0][Watch a YASnippet tutorial here.]]
-
-#+begin_src emacs-lisp
-(use-package yasnippet
-:config
-    (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
-    (yas-global-mode 1))
-#+end_src
-* Prettify Symbols
-Prettify symbols is an easy way to integrate icons into your writing without actually messing up the contents of the file.
+** Prettify Symbols
+~prettify-symbols~ is an easy way to integrate icons into your writing without actually messing up the contents of the file.
 
 For example, open an Org mode document and type "WAIT". See how that turns into a pause icon? This is mostly used for org mode, but it can be used for code and anything involving text.
 ** Org Mode
@@ -393,10 +396,22 @@ Here icons are added to cover up some of orgs keywords like src blocks.
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 (add-hook 'org-mode-hook 'org-icons)
 #+END_SRC
+** YASnippet
+If you've ever written a LaTeX document, you've probably experienced the monotony of writing a preamble. It can be quite annoying to have to repeatedly declare the packages you want to use for every single document.
+Unfortunately, writing boilerplate is not a problem unique to LaTeX. Fortunately, this is fixable with YASnippet.
+[[https://www.youtube.com/watch?v=W-bRZlseNm0][Watch a YASnippet tutorial here.]]
+#+begin_src emacs-lisp
+(use-package yasnippet
+    :config
+    (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+    (yas-global-mode 1))
+#+end_src
+YASnippet sometimes tries to auto-indent snippets, which can mess up our already indented snippets. Luckily, the auto-indent setting is assigned to a variable so we can easily disable it.
+#+begin_src emacs-lisp
+(setq yas-indent-line 'fixed)
+#+end_src
 * Afterword
 And there you have it! VVMacs is fully configured! Of course, thats not the end of your Emacs journey. Want to start programming in a language other than python? Add your own [[https://emacs-lsp.github.io/lsp-mode/][language server!]] Want to integrate email into your emacs config? Try out [[https://www.emacswiki.org/emacs/mu4e][m4ue!]] There is no limit to the insane capabilities of GNU Emacs (you can even make it your [[https://github.com/ch11ng/exwm][window manager]]).
 
 
 Special thanks to [[https://www.youtube.com/channel/UCAiiOTio8Yu69c3XnR7nQBQ][System Crafters]] and the [[https://www.emacswiki.org/][EmacsWiki.]]
-
-
