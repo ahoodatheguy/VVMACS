@@ -148,8 +148,7 @@ Instead of using ~C-x C-s~, lets configure Emacs to use the standard binding. ~C
 ** Select All Key
 Like the save key, most editors allow for selecting all of the text in a window with Ctrl a. But emacs doesn't do that, but fret not, because we can still add it thanks to the extreme customizability of Emacs.
 #+begin_src emacs-lisp
-(if (equal system-type 'darwin)
-    (define-key evil-insert-state-map (kbd "s-a") 'mark-whole-buffer)    ;; macOS save key ⌘
+(unless (equal system-type 'darwin)
     (define-key evil-insert-state-map (kbd "C-a") 'mark-whole-buffer))
 #+end_src
 ** General.el
@@ -194,6 +193,14 @@ This ones pretty simple because projectile has it's own shortcut menu.
 (vvgeneral/projectile-keys
     "pr" '(projectile-command-map :which-key "projectile commands"))
 #+END_SRC
+** Find File
+The default emacs binding for opening a file is ~C-x C-f~, which isn't the best. This line will change it to ~C-o~. (Or ~s-o~ for mac users)
+#+begin_src emacs-lisp
+(if (equal system-type 'darwin)
+    (global-set-key (kbd "s-o") 'find-file)     ;; macOS find file key ⌘
+    (global-set-key (kbd "C-o") 'find-file))
+#+end_src
+
 * Split Navigation
 In emacs you use split buffers when you often when you need to reference something in another document Instead of using our mouse, lets configure our split navigation in a Vim-like way.
 #+begin_src emacs-lisp
@@ -305,6 +312,8 @@ But how does Emacs know what to suggest? For that we use language servers. These
 #+END_SRC
 ** Python
 I personally code in python. So I'll be installing a langauge server for it. If you don't, you can look at the lsp-mode documentation for servers for your preffered language.
+
+(Note: On a new install of VVMacs, you might be prompted to install pyright. This is normal.)
 #+begin_src emacs-lisp
 (use-package lsp-pyright
     :defer t
