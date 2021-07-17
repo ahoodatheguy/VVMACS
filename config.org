@@ -121,6 +121,7 @@ This is for vim users, it enables Vim keybindings in Emacs. If you ever need to 
    :init
    (evil-mode)
    :config
+   (global-unset-key (kbd "C-o"))
    (evil-set-undo-system 'undo-tree))
 #+end_src
 ** Undo-Tree
@@ -195,10 +196,12 @@ This ones pretty simple because projectile has it's own shortcut menu.
 #+END_SRC
 ** Find File
 The default emacs binding for opening a file is ~C-x C-f~, which isn't the best. This line will change it to ~C-o~. (Or ~s-o~ for mac users)
+
+(Note: For non-macOS users, the ~C-o~ binding can only be used in normal mode due to it being an already existing keybind.)
 #+begin_src emacs-lisp
 (if (equal system-type 'darwin)
     (global-set-key (kbd "s-o") 'find-file)     ;; macOS find file key ⌘
-    (global-set-key (kbd "C-o") 'find-file))
+    (evil-define-key 'normal 'global (kbd "C-o") 'find-file))
 #+end_src
 
 * Split Navigation
@@ -274,6 +277,8 @@ Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mo
 (use-package ox-pandoc
     :defer t)
 #+END_SRC
+** Org LaTeX equations.
+Sometimes you need to write advanced eqations in your document. Emacs can convert LaTeX code written in org-mode to actual readable math.
 ** Org Package
 And finally add some finishing touches by configuring the Org Mode package itself.
  #+begin_src emacs-lisp
