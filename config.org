@@ -204,12 +204,22 @@ The default emacs binding for opening a file is ~C-x C-f~, which isn't the best.
 * Split Navigation
 In emacs you use split buffers when you often when you need to reference something in another document Instead of using our mouse, lets configure our split navigation in a Vim-like way.
 #+begin_src emacs-lisp
-(define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
-(define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-(define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
-(define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
+  (unless (equal system-type 'darwin)
+      (progn
+          (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+          (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+          (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
+          (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)))
+
+;; Macos Command Key Split Bindings
+  (if (equal system-type 'darwin)
+      (progn
+          (global-set-key (kbd "s-l") 'windmove-right)
+          (global-set-key (kbd "s-h") 'windmove-left)
+          (global-set-key (kbd "s-j") 'windmove-down)
+          (global-set-key (kbd "s-k") 'windmove-up)))
 #+END_SRC
-* Org Mode Configuration
+* Org Mode
 Ask anyone what pops into their head when they think of Emacs and what would they say? Org Mode! Unfortunately, the default Org Mode is a bit, lackluster. So let's fix that.
 ** Org Superstar
 First, lets install ~org-superstar~, a super helpful package that adds things like bullet points, icons, and titles.
@@ -282,10 +292,28 @@ And finally add some finishing touches by configuring the Org Mode package itsel
    (setq org-startup-folded t)
    (setq org-startup-indented t))
 #+END_SRC
+* LaTeX
+LaTeX is one of the best ways to write papers due to it's robust math and citation features.
+While writing in org mode and converting them to LaTeX documents /is/ an option, you lose out on features like live previews and collaborative editing becomes harder.
+It's up to you what you choose to do, but just in case the config is included.
+** Preview Pane
+LaTeX isn't edited like your typical word document, what you see /isn't/ what you get. Which is why many people like to have an Overleaf-type setup with a preview pane to the side.
+#+begin_src emacs-lisp
+(use-package latex-preview-pane
+    :defer t)
+#+end_src
+There is also a problem where the preview shows up as blurry, the fix to this is to change a variable from within Emacs.
+#+begin_src emacs-lisp
+(setq doc-view-resolution 500)
+#+end_src
+Finally, we need to enable ~latex-preview-pane~ automatically whenever we open a .tex file. Luckily, we can do this without any hook statements.
+#+begin_src emacs-lisp
+(latex-preview-pane-enable)
+#+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
-What's a good code editor without autocomplete? Fortunately, emacs has a package called ~company~ for this very purpose.
+What's a good code editor without autocomplete? Fortunately, Emacs has a package called ~company~ for this very purpose.
 #+begin_src emacs-lisp
 (use-package company
    :after lsp-mode

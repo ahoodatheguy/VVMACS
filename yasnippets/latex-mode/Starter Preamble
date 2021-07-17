@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: Starter Preamble
+# key: \START
+# --
+
+\documentclass{article}
+
+\title{My \LaTeX{} Document}
+
+\author{${1:Author}}
+
+\begin{document}
+\maketitle
+
+$0
+
+\end{document}
