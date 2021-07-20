@@ -329,6 +329,18 @@ What's a good code editor without autocomplete? Fortunately, Emacs has a package
    :bind (:map company-active-map
             ("<tab>" . company-complete-selection)))
 #+END_SRC
+** Auto Comment
+In VSCode there is an extremely useful feature which allows for easily commenting an uncommenting lines in code.
+The ~evil-nerd-commentor~ package adds this feature and even neatly integrates it with evil.
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+    :after evil
+    :config
+    (global-unset-key (kbd "C-/"))
+    :if (equal system-type 'darwin)
+        :bind ("s-/" . evilnc-comment-or-uncomment-lines)
+    :bind ("C-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
 #+begin_src emacs-lisp
