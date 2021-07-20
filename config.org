@@ -121,16 +121,15 @@ This is for vim users, it enables Vim keybindings in Emacs. If you ever need to 
    :init
    (evil-mode)
    :config
-   (global-unset-key (kbd "C-o"))
-   (evil-set-undo-system 'undo-tree))
+   (evil-set-undo-system 'undo-fu)
+   (global-unset-key (kbd "C-o")))
 #+end_src
-** Undo-Tree
-In order to fully make use of Evil mode, the ~undo-tree~ package is installed.
+** Undo Fu
+Evil mode uses ~undo-fu~ to enable undoing and redoing. We used to use ~undo-tree~, but it was not very good. So it's been replaced.
 #+begin_src emacs-lisp
-(use-package undo-tree
-    :after evil
-    :config (global-undo-tree-mode 1))
-#+END_SRC
+(use-package undo-fu
+    :after evil)
+#+end_src
 * Keys
 One of the biggest issues with Emacs is it's awful keybindings. It's so bad that the [[https://www.emacswiki.org/emacs/RepeatedStrainInjury][Emacs wiki]] has a dedicated page on avoiding RSI while using Emacs. As such, this section is designed to bring more "user-friendly" keybinds to Emacs.
 ** Escape Key Escapes
@@ -335,11 +334,12 @@ The ~evil-nerd-commentor~ package adds this feature and even neatly integrates i
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
     :after evil
-    :config
-    (global-unset-key (kbd "C-/"))
     :if (equal system-type 'darwin)
-        :bind ("s-/" . evilnc-comment-or-uncomment-lines)
-    :bind ("C-/" . evilnc-comment-or-uncomment-lines))
+        :bind ("s-/" . evilnc-comment-or-uncomment-lines)) ;; Macos Keybinds
+
+;; Non-macOS keybinds.
+(unless (equal system-type 'darwin)
+    (global-set-key (kbd "C-/") 'evilnc-comment-or-uncomment-lines))
 #+end_src
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
