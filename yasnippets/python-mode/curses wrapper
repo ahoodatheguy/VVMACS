@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: curses wrapper
-# key: <cursed
+# key: <CURSE>
 # --
 
 import curses
