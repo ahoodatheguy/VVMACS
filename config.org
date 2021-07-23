@@ -341,6 +341,12 @@ The ~evil-nerd-commentor~ package adds this feature and even neatly integrates i
 (unless (equal system-type 'darwin)
     (global-set-key (kbd "C-/") 'evilnc-comment-or-uncomment-lines))
 #+end_src
+** Code Folding
+Almost every IDE or Code Editor has a feature called code folding. Allowing for cleaner code. Emacs has a built in function called ~hs-minor-mode~ which is neatly integrated into evil mode.
+#+begin_src emacs-lisp
+(add-hook 'python-mode-hook 'hs-minor-mode)
+#+end_src
+
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
 #+begin_src emacs-lisp
