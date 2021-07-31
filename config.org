@@ -17,7 +17,7 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
 (package-initialize)
 #+end_src
 ** EmacsWiki
-The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to cusotmize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
+The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to customize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
 * Appearance
 ** Startup UI
 *** Disable Startup Message
@@ -108,7 +108,7 @@ The ~doom-themes~ package is a collection of popular themes.
 #+begin_src emacs-lisp
 (use-package doom-themes)
 #+END_SRC
-*** Set Default Themes
+*** Set Default Theme
 Downloading themes means nothing if you can't actually use them, so set them with ~load-theme~.
 #+begin_src emacs-lisp
 (load-theme 'doom-snazzy t)
@@ -294,24 +294,6 @@ And finally add some finishing touches by configuring the Org Mode package itsel
    (setq org-startup-folded t)
    (setq org-startup-indented t))
 #+END_SRC
-* LaTeX
-LaTeX is one of the best ways to write papers due to it's robust math and citation features.
-While writing in org mode and converting them to LaTeX documents /is/ an option, you lose out on features like live previews and collaborative editing becomes harder.
-It's up to you what you choose to do, but just in case the config is included.
-** Preview Pane
-LaTeX isn't edited like your typical word document, what you see /isn't/ what you get. Which is why many people like to have an Overleaf-type setup with a preview pane to the side.
-#+begin_src emacs-lisp
-(use-package latex-preview-pane
-    :defer t)
-#+end_src
-There is also a problem where the preview shows up as blurry, the fix to this is to change a variable from within Emacs.
-#+begin_src emacs-lisp
-(setq doc-view-resolution 500)
-#+end_src
-Finally, we need to enable ~latex-preview-pane~ automatically whenever we open a .tex file. Luckily, we can do this without any hook statements.
-#+begin_src emacs-lisp
-(latex-preview-pane-enable)
-#+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
@@ -346,7 +328,6 @@ Almost every IDE or Code Editor has a feature called code folding. Allowing for 
 #+begin_src emacs-lisp
 (add-hook 'python-mode-hook 'hs-minor-mode)
 #+end_src
-
 ** Language Server
 But how does Emacs know what to suggest? For that we use language servers. These provide helpful features like linting.
 #+begin_src emacs-lisp
@@ -404,6 +385,14 @@ Git is one of the most important tools for developers, chances are you've downlo
   :config (projectile-mode))
 #+END_SRC
 * Misc
+** Discord Rich Presence
+Let your friends know how cool your text editor is.
+#+begin_src emacs-lisp
+(use-package elcord)
+
+(unless (daemonp)
+    (elcord-mode))
+#+end_src
 ** Backup Files
 Emacs periodically creates backup files. The problem is they get in the way of your projects file structure and are quite annoying. We can send these files into a different directory with the following lines of code.
 #+begin_src emacs-lisp
