@@ -176,6 +176,13 @@ General used with magit allows for operating extremely fast. The leader key for 
   "g" '(:ignore t :which-key "magit shortcuts")
   "gs" '(magit-status :which-key "git status")
   "gb" '(magit-branch :which-key "git branch actions")
+  ;; File Shortcuts
+  "gf" '(:ignore t :which-key "file actions")
+  "gfs" '(magit-stage-file :which-key "stage current file")
+  "gfu" '(magit-unstage-file :which-key "unstage current file")
+  "gfr" '(magit-restore :which-key "restore file")
+  ;; Commits
+  "gc" '(magit-commit :which-key "commit actions")
 )
 #+END_SRC
 *** Buffer Shortcuts
@@ -208,10 +215,10 @@ In emacs you use split buffers when you often when you need to reference somethi
 #+begin_src emacs-lisp
   (unless (equal system-type 'darwin)
       (progn
-          (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
-          (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-          (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
-          (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)))
+          (global-set-key (kbd "C-l") 'windmove-right)
+          (global-set-key (kbd "C-k") 'windmove-up)
+          (global-set-key (kbd "C-j") 'windmove-down)
+          (global-set-key (kbd "C-h") 'windmove-left)))
 
 ;; Macos Command Key Split Bindings
   (if (equal system-type 'darwin)
