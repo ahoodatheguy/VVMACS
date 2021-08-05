@@ -184,7 +184,7 @@ General used with magit allows for operating extremely fast. The leader key for 
   "gf" '(:ignore t :which-key "file actions")
   "gfs" '(magit-stage-file :which-key "stage current file")
   "gfu" '(magit-unstage-file :which-key "unstage current file")
-  "gfr" '(magit-restore :which-key "restore file")
+  "gfr" '(magit-reset :which-key "restore file")
   ;; Commits
   "gc" '(magit-commit :which-key "commit actions")
 )
@@ -213,7 +213,6 @@ The default emacs binding for opening a file is ~C-x C-f~, which isn't the best.
     (global-set-key (kbd "s-o") 'find-file)     ;; macOS find file key ⌘
     (evil-define-key 'normal 'global (kbd "C-o") 'find-file))
 #+end_src
-
 * Split Navigation
 Use vim-like navigation to change splits.
 #+begin_src emacs-lisp
@@ -373,18 +372,13 @@ Built in terminal in Emacs.
   (setq explicit-shell-file-name "zsh")
   ;;(setq explicit-zsh-args '())
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
-
-#+end_src
-*** 256 Color Support
-#+begin_src emacs-lisp
-(use-package eterm-256color
-  :hook (term-mode . eterm-256color-mode))
 #+end_src
 ** vterm
 A better terminal editor package in emacs. It's up to you which one you want to use.
 *NOTE:* Make sure to install CMake to get it to work.
 #+begin_src emacs-lisp
 (use-package vterm
+  :defer t
   :commands vterm
   :config
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Match shell prompt
