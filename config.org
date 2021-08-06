@@ -147,8 +147,7 @@ Instead of using ~C-x C-s~, configure Emacs to use ~C-s~.
 #+begin_src emacs-lisp
 (if (equal system-type 'darwin)
   (global-set-key (kbd "s-s") 'save-buffer)     ;; macOS save key ⌘
-  (global-set-key (kbd "C-s") 'save-buffer)
-)
+  (global-set-key (kbd "C-s") 'save-buffer))
 #+END_SRC
 ** Select All Key
 ~C-a~ selects all text in buffer.
@@ -248,13 +247,15 @@ Various tweaks to improve Org-Mode.
 ** Margins
 Second, lets put some margins on Org Mode so it looks like a real document.
 #+begin_src emacs-lisp
-(defun vv/org-mode-visual-fill ()
-   (setq visual-fill-column-width 100
-   visual-fill-column-center-text t)
-   (visual-fill-column-mode 1))
-(use-package visual-fill-column
-   :defer t
-   :hook (org-mode . vv/org-mode-visual-fill))
+  (defun vv/org-mode-visual-fill ()
+     (setq visual-fill-column-width 100
+     visual-fill-column-center-text t)
+     (visual-fill-column-mode 1)
+     (electric-pair-mode 0)
+  )
+  (use-package visual-fill-column
+     :defer t
+     :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
 ** Header Font
 Custom fonts for headers. Uses Roboto.
@@ -298,6 +299,29 @@ And finally add some finishing touches by configuring the Org Mode package itsel
     (setq org-startup-folded t)
     (setq org-startup-indented t))
 #+END_SRC
+** Src Block Shortcuts
+Easy ways to create src blocks. 
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("py" . "src python :session :results output replace"))
+  (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
+** Code Evaluation
+Org Mode can be used like Jupyter Notebooks in the sense that code can be written in executed directly inside of Org. You can run these code blocks with ~C-c C-C~
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (python . t)
+     (java . t)
+    ))
+#+end_src
+Whenever you attempt to run a code block, youll get a warning. It's up to you whether or not you want this as it can help security. But for conveniences sake, it's disabled by default.
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+#+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
@@ -467,6 +491,7 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
 (defun org-icons ()
    "Beautify org mode keywords."
    (setq prettify-symbols-alist '(
+	                          ("#+RESULTS:" . "")        
 	                          ("#+begin_src" . "")        
  				  ("#+begin_src" . "")
                             ("#+end_src" . "")
