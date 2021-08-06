@@ -1,6 +1,64 @@
 #+TITLE:VVMACS Configuration
 #+STARTUP: hideblocks
 
+
+* Table of Contents :toc:
+- [[#introduction][Introduction]]
+  - [[#melpa][MELPA]]
+  - [[#emacswiki][EmacsWiki]]
+- [[#appearance][Appearance]]
+  - [[#startup-ui][Startup UI]]
+  - [[#modeline][Modeline]]
+  - [[#text-only-quit-messages][Text Only Quit Messages]]
+  - [[#default-font][Default Font]]
+  - [[#ivy][Ivy]]
+  - [[#swiper][Swiper]]
+  - [[#which-key][Which-Key]]
+  - [[#rainbow-delimeters][Rainbow Delimeters]]
+  - [[#line-numbers][Line Numbers]]
+  - [[#themes][Themes]]
+- [[#evil-mode][Evil Mode]]
+  - [[#undo-fu][Undo Fu]]
+- [[#keys][Keys]]
+  - [[#escape-key-escapes][Escape Key Escapes]]
+  - [[#save-key][Save Key]]
+  - [[#select-all-key][Select All Key]]
+  - [[#generalel][General.el]]
+  - [[#find-file][Find File]]
+- [[#split-navigation][Split Navigation]]
+- [[#org-mode][Org Mode]]
+  - [[#org-superstar][Org Superstar]]
+  - [[#margins][Margins]]
+  - [[#header-font][Header Font]]
+  - [[#org-pandoc][Org-Pandoc]]
+  - [[#code-evaluation][Code Evaluation]]
+  - [[#src-block-shortcuts][Src Block Shortcuts]]
+  - [[#table-of-contents][Table of Contents]]
+  - [[#org-package][Org Package]]
+- [[#development][Development]]
+  - [[#autocomplete][Autocomplete]]
+  - [[#auto-comment][Auto Comment]]
+  - [[#code-folding][Code Folding]]
+  - [[#language-server][Language Server]]
+  - [[#python][Python]]
+  - [[#term-mode][Term Mode]]
+  - [[#vterm][vterm]]
+  - [[#git-integration][Git Integration]]
+  - [[#projectile][Projectile]]
+- [[#daemon-mode][Daemon Mode]]
+  - [[#font][Font]]
+  - [[#scrollbar][Scrollbar]]
+  - [[#modeline-icon][Modeline Icon]]
+  - [[#transparency][Transparency]]
+- [[#misc][Misc]]
+  - [[#discord-rich-presence][Discord Rich Presence]]
+  - [[#backup-files][Backup Files]]
+  - [[#delete-highlighted-text][Delete Highlighted Text]]
+  - [[#macos-fixes][macOS Fixes]]
+  - [[#prettify-symbols][Prettify Symbols]]
+  - [[#yasnippet][YASnippet]]
+- [[#afterword][Afterword]]
+
 * Introduction
 Emacs is a *not* a text editor, it is a fully featured enviroment for Elisp code. It just happens to be able to edit text. As such, it allows for customization and extensibility far beyond the likes of VSCode and even Vim.
 
@@ -260,16 +318,16 @@ Second, lets put some margins on Org Mode so it looks like a real document.
 ** Header Font
 Custom fonts for headers. Uses Roboto.
 #+begin_src emacs-lisp
-(defun vv/org-font ()
-    (dolist (face '((org-level-1 . 1.2)
-    (org-level-2 . 1.1)
-    (org-level-3 . 1.05)
-    (org-level-4 . 1.0)
-    (org-level-5 . 1.1)
-    (org-level-6 . 1.1)
-    (org-level-7 . 1.1)
-    (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face))))
+  (defun vv/org-font ()
+      (dolist (face '((org-level-1 . 1.2)
+      (org-level-2 . 1.1)
+      (org-level-3 . 1.05)
+      (org-level-4 . 1.0)
+      (org-level-5 . 1.1)
+      (org-level-6 . 1.1)
+      (org-level-7 . 1.1)
+      (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face))))
 #+END_SRC
 ** Org-Pandoc
 Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
@@ -279,35 +337,6 @@ Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mo
 (use-package ox-pandoc
     :defer t)
 #+END_SRC
-** Org Package
-And finally add some finishing touches by configuring the Org Mode package itself.
- #+begin_src emacs-lisp
-(defun vv/org-setup ()
-  (org-indent-mode)
-  (visual-line-mode t)
-  (setq evil-auto-indent nil)
-  (setq org-src-ask-before-returning-to-edit-buffer nil))
-(use-package org
-    :hook
-    (org-mode . vv/org-font)
-    (org-mode . vv/org-setup)
-    :config
-    (setq org-ellipsis " ⤵")
-    (setq org-hide-emphasis-markers t)
-    (setq org-support-shift-select t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-startup-folded t)
-    (setq org-startup-indented t))
-#+END_SRC
-** Src Block Shortcuts
-Easy ways to create src blocks. 
-#+begin_src emacs-lisp
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("py" . "src python :session :results output replace"))
-  (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-#+end_src
 ** Code Evaluation
 Org Mode can be used like Jupyter Notebooks in the sense that code can be written in executed directly inside of Org. You can run these code blocks with ~C-c C-C~
 #+begin_src emacs-lisp
@@ -322,6 +351,44 @@ Whenever you attempt to run a code block, youll get a warning. It's up to you wh
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
 #+end_src
+** Src Block Shortcuts
+Easy ways to create src blocks. 
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("py" . "src python :session :results output replace"))
+  (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
+** Table of Contents
+The ~toc-org~ package brings table of contents to org mode.
+#+begin_src emacs-lisp
+  (use-package toc-org
+    :defer t
+    :after org)
+#+end_src
+
+** Org Package
+And finally add some finishing touches by configuring the Org Mode package itself.
+ #+begin_src emacs-lisp
+(defun vv/org-setup ()
+  (org-indent-mode)
+  (visual-line-mode t)
+  (setq evil-auto-indent nil)
+  (setq org-src-ask-before-returning-to-edit-buffer nil))
+(use-package org
+    :hook
+    (org-mode . toc-org-mode)
+    (org-mode . vv/org-font)
+    (org-mode . vv/org-setup)
+    :config
+    (setq org-ellipsis " ⤵")
+    (setq org-hide-emphasis-markers t)
+    (setq org-support-shift-select t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-startup-folded t)
+    (setq org-startup-indented t))
+#+END_SRC
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
@@ -491,6 +558,7 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
 (defun org-icons ()
    "Beautify org mode keywords."
    (setq prettify-symbols-alist '(
+	                          (":toc:" . "")        
 	                          ("#+RESULTS:" . "")        
 	                          ("#+begin_src" . "")        
  				  ("#+begin_src" . "")
