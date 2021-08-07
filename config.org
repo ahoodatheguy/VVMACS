@@ -351,6 +351,15 @@ Whenever you attempt to run a code block, youll get a warning. It's up to you wh
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
 #+end_src
+Also enable lsp-mode in the Org Src Buffer, allowing for a seamless editing experience.
+To activiate it within a python src block,
+- Run ~C-c C-'~ in a src block.
+- ~M-x python-mode~ in the src buffer.
+#+begin_src emacs-lisp
+(defun org-babel-edit-prep:python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (lsp))
+#+end_src
 ** Src Block Shortcuts
 Easy ways to create src blocks. 
 #+begin_src emacs-lisp
@@ -559,7 +568,7 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
    "Beautify org mode keywords."
    (setq prettify-symbols-alist '(
 	                          (":toc:" . "")        
-	                          ("#+RESULTS:" . "")        
+	                          ("#+RESULTS:" . "")        
 	                          ("#+begin_src" . "")        
  				  ("#+begin_src" . "")
                             ("#+end_src" . "")
