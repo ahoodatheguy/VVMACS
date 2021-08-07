@@ -1,10 +1,12 @@
 # -*- mode: snippet -*-
 # name: Notes Boilerplate
-# key: N
+# key: NOTE
 # --
 
 #+TITLE:${1:Subject}
 #+DATE: `(format-time-string "%Y-%m-%d")`
+#+OPTIONS: toc:2
 
+* Table of Contents :toc:
 
 $0

@@ -1,5 +1,6 @@
 #+TITLE:VVMACS Configuration
 #+STARTUP: hideblocks
+#+OPTIONS: toc:2
 
 
 * Table of Contents :toc:
@@ -27,14 +28,11 @@
   - [[#find-file][Find File]]
 - [[#split-navigation][Split Navigation]]
 - [[#org-mode][Org Mode]]
-  - [[#org-superstar][Org Superstar]]
-  - [[#margins][Margins]]
-  - [[#header-font][Header Font]]
-  - [[#org-pandoc][Org-Pandoc]]
-  - [[#code-evaluation][Code Evaluation]]
-  - [[#src-block-shortcuts][Src Block Shortcuts]]
-  - [[#table-of-contents][Table of Contents]]
+  - [[#appearance-1][Appearance]]
+  - [[#note-taking][Note Taking]]
+  - [[#src-blocks][SRC Blocks]]
   - [[#org-package][Org Package]]
+  - [[#org-pandoc][Org-Pandoc]]
 - [[#development][Development]]
   - [[#autocomplete][Autocomplete]]
   - [[#auto-comment][Auto Comment]]
@@ -228,6 +226,9 @@ Package for vim like keybindings with leader keys.
    (general-create-definer vvgeneral/projectile-keys
   :keymaps '(normal)
   :prefix "SPC")
+   (general-create-definer vvgeneral/roam-keys
+  :keymaps '(normal)
+  :prefix "SPC")
 )
 #+END_SRC
 *** Git Shortcuts
@@ -261,6 +262,16 @@ This ones pretty simple because projectile has it's own shortcut menu.
 (vvgeneral/projectile-keys
     "pr" '(projectile-command-map :which-key "projectile commands"))
 #+END_SRC
+*** Roam Shortcuts
+Org Roam Shortcuts use the typical ~C-c~ + key sequence bindings by default. Change them to our ~SPC-r~ + key.
+#+begin_src emacs-lisp
+(vvgeneral/roam-keys
+    "r" '(:ignore t :which-key "roam shortcuts")
+    "rf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "rc" '(org-roam-capture :which-key "org-roam-capture")
+    "rl" '(org-roam-node-insert :which-key "org-roam-node-insert")
+)
+#+end_src
 ** Find File
 The default emacs binding for opening a file is ~C-x C-f~, which isn't the best. This line will change it to ~C-o~. (Or ~s-o~ for mac users)
 
@@ -290,7 +301,9 @@ Use vim-like navigation to change splits.
 #+END_SRC
 * Org Mode
 Various tweaks to improve Org-Mode.
-** Org Superstar
+** Appearance
+Make Org Mode look nice
+*** Org Superstar
 ~org-superstar~ is used for custom bullet points and titles.
 #+begin_src emacs-lisp
 (use-package org-superstar
@@ -302,7 +315,7 @@ Various tweaks to improve Org-Mode.
     (setq org-superstar-headline-bullets-list '("●" "—" "+"))
     (setq org-hidden-keywords '(title)))
 #+END_SRC
-** Margins
+*** Margins
 Second, lets put some margins on Org Mode so it looks like a real document.
 #+begin_src emacs-lisp
   (defun vv/org-mode-visual-fill ()
@@ -315,7 +328,7 @@ Second, lets put some margins on Org Mode so it looks like a real document.
      :defer t
      :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
-** Header Font
+*** Header Font
 Custom fonts for headers. Uses Roboto.
 #+begin_src emacs-lisp
   (defun vv/org-font ()
@@ -329,16 +342,37 @@ Custom fonts for headers. Uses Roboto.
       (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face))))
 #+END_SRC
-** Org-Pandoc
-Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
-
-*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
+*** Table of Contents
+The ~toc-org~ package brings table of contents to org mode.
 #+begin_src emacs-lisp
-(use-package ox-pandoc
-    :defer t)
-#+END_SRC
-** Code Evaluation
+  (use-package toc-org
+    :defer t
+    :after org)
+#+end_src
+** Note Taking
+Org Mode is great for note taking when configured properly.
+*** Roam
+#+begin_src emacs-lisp
+(use-package org-roam
+      :ensure t
+      :init
+      (setq org-roam-v2-ack t)
+      :custom
+      (org-roam-directory "~/Documents/Notes/")
+      :bind (("C-c n l" . org-roam-buffer-toggle)
+             ("C-c n f" . org-roam-node-find)
+             ("C-c n g" . org-roam-graph)
+             ("C-c n i" . org-roam-node-insert)
+             ("C-c n c" . org-roam-capture)
+             ;; Dailies
+             ("C-c n j" . org-roam-dailies-capture-today))
+      :config
+      (org-roam-setup))
+#+end_src
+** SRC Blocks
+*** Code Evaluation
 Org Mode can be used like Jupyter Notebooks in the sense that code can be written in executed directly inside of Org. You can run these code blocks with ~C-c C-C~
+*NOTE:* Mac users may get a warning upon running a python code block. This is normal, just close the buffer.
 #+begin_src emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -346,6 +380,10 @@ Org Mode can be used like Jupyter Notebooks in the sense that code can be writte
      (python . t)
      (java . t)
     ))
+
+(if (eq system-type 'darwin)
+    (setq org-babel-python-command "python3"))
+    
 #+end_src
 Whenever you attempt to run a code block, youll get a warning. It's up to you whether or not you want this as it can help security. But for conveniences sake, it's disabled by default.
 #+begin_src emacs-lisp
@@ -360,7 +398,7 @@ To activiate it within a python src block,
   (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
   (lsp))
 #+end_src
-** Src Block Shortcuts
+*** SRC Block Shortcuts
 Easy ways to create src blocks. 
 #+begin_src emacs-lisp
   (require 'org-tempo)
@@ -369,14 +407,6 @@ Easy ways to create src blocks.
   (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src
-** Table of Contents
-The ~toc-org~ package brings table of contents to org mode.
-#+begin_src emacs-lisp
-  (use-package toc-org
-    :defer t
-    :after org)
-#+end_src
-
 ** Org Package
 And finally add some finishing touches by configuring the Org Mode package itself.
  #+begin_src emacs-lisp
@@ -397,6 +427,14 @@ And finally add some finishing touches by configuring the Org Mode package itsel
     (setq org-src-tab-acts-natively t)
     (setq org-startup-folded t)
     (setq org-startup-indented t))
+#+END_SRC
+** Org-Pandoc
+Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
+
+*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
+#+begin_src emacs-lisp
+(use-package ox-pandoc
+    :defer t)
 #+END_SRC
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
