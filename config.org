@@ -31,8 +31,8 @@
   - [[#appearance-1][Appearance]]
   - [[#note-taking][Note Taking]]
   - [[#src-blocks][SRC Blocks]]
-  - [[#org-package][Org Package]]
   - [[#org-pandoc][Org-Pandoc]]
+  - [[#org-package][Org Package]]
 - [[#development][Development]]
   - [[#autocomplete][Autocomplete]]
   - [[#auto-comment][Auto Comment]]
@@ -113,6 +113,13 @@ Replace the annoying popup that appears whenever attempting to close a window wi
 #+begin_src emacs-lisp
 (set-frame-font "Fira Code-18" nil t)
 #+END_SRC
+*** Emoji Font
+Emojis aren't natively supported in Emacs, you need to set the font for them.
+#+begin_src emacs-lisp
+(when (member "Apple Color Emoji" (font-family-list))
+  (set-fontset-font
+   t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+#+end_src
 ** Ivy
 Autocomplete for menus like ~M-x~.
 #+begin_src emacs-lisp
@@ -407,6 +414,14 @@ Easy ways to create src blocks.
   (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src
+** Org-Pandoc
+Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
+
+*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
+#+begin_src emacs-lisp
+(use-package ox-pandoc
+    :defer t)
+#+END_SRC
 ** Org Package
 And finally add some finishing touches by configuring the Org Mode package itself.
  #+begin_src emacs-lisp
@@ -421,20 +436,12 @@ And finally add some finishing touches by configuring the Org Mode package itsel
     (org-mode . vv/org-font)
     (org-mode . vv/org-setup)
     :config
-    (setq org-ellipsis " ⤵")
+    (setq org-ellipsis " ⤸")
     (setq org-hide-emphasis-markers t)
     (setq org-support-shift-select t)
     (setq org-src-tab-acts-natively t)
     (setq org-startup-folded t)
     (setq org-startup-indented t))
-#+END_SRC
-** Org-Pandoc
-Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
-
-*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
-#+begin_src emacs-lisp
-(use-package ox-pandoc
-    :defer t)
 #+END_SRC
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
