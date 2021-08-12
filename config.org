@@ -619,11 +619,7 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
                             ("#+end_src" . "")
                             ("#+END_SRC" . "")
 				  ("[ ]" . "")
-				  ("[X]" . "")
-                            ("TODO" . "")
-	                          ("WAIT" . "")        
-  			  ("NOPE" . "")
-				  ("DONE" . "✔"))))
+				  ("[X]" . ""))))
 
 (add-hook 'org-mode-hook 'prettify-symbols-mode)
 (add-hook 'org-mode-hook 'org-icons)
