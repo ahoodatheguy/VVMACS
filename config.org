@@ -454,8 +454,14 @@ ERC is Emacs built-in IRC client.
         erc-kill-buffer-on-part t    ;; Kill a chat buffer when you leave the server
         erc-track-shorten-start 20   ;; Doom modeline longer notifs
         erc-auto-query 'bury)        ;; Don't popup chat buffer when you get a notif.
-#+end_src
 
+  (defun erc-setup ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t
+          visual-fill-column-mode t)
+    (display-line-numbers-mode 0))
+  (add-hook 'erc-mode-hook 'erc-setup)
+#+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
