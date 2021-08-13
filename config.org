@@ -33,6 +33,7 @@
   - [[#src-blocks][SRC Blocks]]
   - [[#org-pandoc][Org-Pandoc]]
   - [[#org-package][Org Package]]
+- [[#erc][ERC]]
 - [[#development][Development]]
   - [[#autocomplete][Autocomplete]]
   - [[#auto-comment][Auto Comment]]
@@ -443,6 +444,19 @@ And finally add some finishing touches by configuring the Org Mode package itsel
     (setq org-startup-folded t)
     (setq org-startup-indented t))
 #+END_SRC
+* ERC
+ERC is Emacs built-in IRC client.
+
+*NOTE:* Always run ~erc-tls~ instead of ~erc~ for encrypted traffic!
+
+#+begin_src emacs-lisp
+  (setq erc-server "irc.libera.chat" ;; join libera chat by default
+        erc-nick "ahooda"            ;; set the nick name automatically
+        erc-kill-buffer-on-part t    ;; Kill a chat buffer when you leave the server
+        erc-track-shorten-start 8    ;; Doom modeline longer notifs
+        erc-auto-query 'bury)        ;; Don't popup chat buffer when you get a notif.
+#+end_src
+
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 ** Autocomplete
