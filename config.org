@@ -382,16 +382,19 @@ Org Mode is great for note taking when configured properly.
 Org Mode can be used like Jupyter Notebooks in the sense that code can be written in executed directly inside of Org. You can run these code blocks with ~C-c C-C~
 *NOTE:* Mac users may get a warning upon running a python code block. This is normal, just close the buffer.
 #+begin_src emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (python . t)
-     (java . t)
-    ))
+  (require 'ob-shell)  ;; Required for shell scripting.
 
-(if (eq system-type 'darwin)
-    (setq org-babel-python-command "python3"))
-    
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '(
+      (shell . t)  ;; Shell scripting
+      (python . t)  ;; Python
+      (java . t)  ;; Java
+  ))
+
+  (if (eq system-type 'darwin)
+      (setq org-babel-python-command "python3"))  ;; Use python3 on macOS. 
+
 #+end_src
 Whenever you attempt to run a code block, youll get a warning. It's up to you whether or not you want this as it can help security. But for conveniences sake, it's disabled by default.
 #+begin_src emacs-lisp
@@ -414,6 +417,7 @@ Easy ways to create src blocks.
   (add-to-list 'org-structure-template-alist '("py" . "src python :session :results output replace"))
   (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
 #+end_src
 ** Org-Pandoc
 Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
@@ -461,6 +465,7 @@ ERC is Emacs built-in IRC client.
           visual-fill-column-mode t)
     (display-line-numbers-mode 0))
   (add-hook 'erc-mode-hook 'erc-setup)
+  (add-hook 'erc-mode-hook 'visual-fill-column-mode 1)
 #+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
