@@ -294,10 +294,10 @@ Use vim-like navigation to change splits.
 #+begin_src emacs-lisp
   (unless (equal system-type 'darwin)
       (progn
-          (global-set-key (kbd "C-l") 'windmove-right)
-          (global-set-key (kbd "C-k") 'windmove-up)
-          (global-set-key (kbd "C-j") 'windmove-down)
-          (global-set-key (kbd "C-h") 'windmove-left)))
+          (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+          (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+          (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
+          (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)))
 
 ;; Macos Command Key Split Bindings
   (if (equal system-type 'darwin)
