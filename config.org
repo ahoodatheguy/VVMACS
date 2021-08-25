@@ -417,7 +417,7 @@ Easy ways to create src blocks.
   (add-to-list 'org-structure-template-alist '("py" . "src python :session :results output replace"))
   (add-to-list 'org-structure-template-alist '("java" . "src java :results output"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh :results output replace"))
 #+end_src
 ** Org-Pandoc
 Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
