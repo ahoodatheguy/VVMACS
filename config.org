@@ -40,6 +40,7 @@
   - [[#code-folding][Code Folding]]
   - [[#language-server][Language Server]]
   - [[#python][Python]]
+  - [[#shell-scripting][Shell Scripting]]
   - [[#term-mode][Term Mode]]
   - [[#vterm][vterm]]
   - [[#git-integration][Git Integration]]
@@ -403,7 +404,7 @@ Whenever you attempt to run a code block, youll get a warning. It's up to you wh
 Also enable lsp-mode in the Org Src Buffer, allowing for a seamless editing experience.
 To activiate it within a python src block,
 - Run ~C-c C-'~ in a src block.
-- ~M-x python-mode~ in the src buffer.
+- ~M-x (language)-mode~ in the src buffer.
 #+begin_src emacs-lisp
 (defun org-babel-edit-prep:python (babel-info)
   (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
@@ -503,17 +504,18 @@ Code folding with evil.
 ** Language Server
 Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ is the framework for language servers.
 #+begin_src emacs-lisp
-(use-package lsp-mode
-    :ensure t
-    :defer t
-    :commands (lsp lsp-deferred)
-    :config
-        (setq lsp-keymap-prefix "C-c l")
-    :config
-        (lsp-enable-which-key-integration t))
+  (use-package lsp-mode
+      :ensure t
+      :defer t
+      :commands (lsp-mode lsp lsp-deferred)
+      :config
+          (setq lsp-keymap-prefix "C-c l")
+      :config
+          (lsp-enable-which-key-integration t))
 #+END_SRC
 ** Python
-Python Language Server
+*** lsp-pyright
+Python's language server
 *NOTE:* On a new install of VVMacs, you might be prompted to install pyright. This is normal.
 #+begin_src emacs-lisp
 (use-package lsp-pyright
@@ -523,6 +525,7 @@ Python Language Server
             (require 'lsp-pyright)
             (lsp-deferred))))  ; or lsp-deferred
 #+END_SRC
+*** Tabs, Lines, and Pairs
 I also like to code with tabs exclusivley for my indentation. So I'm going to set that up here along with some other neat settings.
 #+begin_src emacs-lisp
 (add-hook 'python-mode-hook
@@ -533,6 +536,19 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
     (toggle-truncate-lines t)
     (electric-pair-mode 1)))
 #+END_SRC
+** Shell Scripting
+*** bash-ls
+~bash-ls~ is the language server for shell scripting, install it with ~M-x~ RET ~lsp-install-server~ RET ~bash-ls~
+*** Hooks
+#+begin_src emacs-lisp
+  (add-hook 'sh-mode-hook
+    (lambda ()
+      (setq indent-tabs-mode t)
+      (toggle-truncate-lines t)
+      (electric-pair-mode 1)
+      (setq tab-width 4)
+      (lsp-mode)))
+#+end_src
 ** Term Mode
 Built in terminal in Emacs.
 #+begin_src emacs-lisp
