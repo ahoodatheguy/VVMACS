@@ -40,6 +40,7 @@
   - [[#auto-pairing][Auto Pairing]]
   - [[#code-folding][Code Folding]]
   - [[#language-server][Language Server]]
+  - [[#treemacs][Treemacs]]
   - [[#python][Python]]
   - [[#shell-scripting][Shell Scripting]]
   - [[#term-mode][Term Mode]]
@@ -233,7 +234,7 @@ Package for vim like keybindings with leader keys.
    (general-create-definer vvgeneral/buffer-keys
   :keymaps '(normal)
   :prefix "SPC")
-   (general-create-definer vvgeneral/projectile-keys
+   (general-create-definer vvgeneral/projectile-and-treemacs-keys
   :keymaps '(normal)
   :prefix "SPC")
    (general-create-definer vvgeneral/roam-keys
@@ -269,8 +270,10 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
 *** Projectile Shortcuts
 This ones pretty simple because projectile has it's own shortcut menu.
 #+begin_src emacs-lisp
-(vvgeneral/projectile-keys
-    "pr" '(projectile-command-map :which-key "projectile commands"))
+  (vvgeneral/projectile-and-treemacs-keys
+      "p" '(:ignore t :which-key "project actions")
+      "pp" '(treemacs :which-key "treemacs")
+      "pr" '(projectile-command-map :which-key "projectile commands"))
 #+END_SRC
 *** Roam Shortcuts
 Org Roam Shortcuts use the typical ~C-c~ + key sequence bindings by default. Change them to our ~SPC-r~ + key.
@@ -527,6 +530,24 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     (setq lsp-ui-doc-enable t)
     :hook (lsp-mode . lsp-ui-mode))
 #+END_SRC
+** Treemacs
+Treemacs is a VSCode like sidebar for viewing files in a project.
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :defer t
+    :ensure t
+    :config
+    (setq treemacs-show-hidden-files t)
+    (setq treemacs-width 25))
+#+end_src
+Treemacs icons also kinda suck, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
+#+begin_src emacs-lisp
+  (use-package treemacs-all-the-icons
+    :after treemacs
+    :config
+    (treemacs-load-theme "all-the-icons")
+    :ensure t)
+#+end_src
 ** Python
 *** lsp-pyright
 Python's language server
