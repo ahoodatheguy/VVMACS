@@ -37,6 +37,7 @@
 - [[#development][Development]]
   - [[#autocomplete][Autocomplete]]
   - [[#auto-comment][Auto Comment]]
+  - [[#auto-pairing][Auto Pairing]]
   - [[#code-folding][Code Folding]]
   - [[#language-server][Language Server]]
   - [[#python][Python]]
@@ -330,9 +331,7 @@ Second, lets put some margins on Org Mode so it looks like a real document.
   (defun vv/org-mode-visual-fill ()
      (setq visual-fill-column-width 100
      visual-fill-column-center-text t)
-     (visual-fill-column-mode 1)
-     (electric-pair-mode 0)
-  )
+     (visual-fill-column-mode 1))
   (use-package visual-fill-column
      :defer t
      :hook (org-mode . vv/org-mode-visual-fill))
@@ -496,10 +495,15 @@ Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 (unless (equal system-type 'darwin)
     (global-set-key (kbd "C-/") 'evilnc-comment-or-uncomment-lines))
 #+end_src
+** Auto Pairing
+Automatic pairing of quotes and things.
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook 'electric-pair-mode)
+#+end_src
 ** Code Folding
 Code folding with evil.
 #+begin_src emacs-lisp
-(add-hook 'python-mode-hook 'hs-minor-mode)
+(add-hook 'prog-mode-hook 'hs-minor-mode)
 #+end_src
 ** Language Server
 Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ is the framework for language servers.
@@ -508,10 +512,13 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
       :ensure t
       :defer t
       :commands (lsp-mode lsp lsp-deferred)
-      :config
+      :init
           (setq lsp-keymap-prefix "C-c l")
       :config
-          (lsp-enable-which-key-integration t))
+      (setq lsp-signature-render-documentation nil)
+      (setq lsp-signature-auto-activate nil)
+      (setq lsp-headerline-breadcrumb-enable nil)
+      (lsp-enable-which-key-integration t))
 #+END_SRC
 ** Python
 *** lsp-pyright
@@ -533,8 +540,7 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
     (setq indent-tabs-mode t)
     (setq python-indent 4)
     (setq tab-width 4)
-    (toggle-truncate-lines t)
-    (electric-pair-mode 1)))
+    (toggle-truncate-lines t)))
 #+END_SRC
 ** Shell Scripting
 *** bash-ls
@@ -545,7 +551,6 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
     (lambda ()
       (setq indent-tabs-mode t)
       (toggle-truncate-lines t)
-      (electric-pair-mode 1)
       (setq tab-width 4)
       (lsp-mode)))
 #+end_src
