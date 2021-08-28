@@ -25,6 +25,7 @@
   - [[#undo-fu][undo-fu]]
 - [[#keys][Keys]]
   - [[#escape-key-escapes][Escape Key Escapes]]
+  - [[#delete-word-with-c-backspace][Delete Word with C-Backspace]]
   - [[#save-key][Save Key]]
   - [[#select-all-key][Select All Key]]
   - [[#generalel][General.el]]
@@ -226,6 +227,12 @@ Escape key quits menus.
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
+** Delete Word with C-Backspace
+Delete the previous word with ~c-backspace~ like in other apps
+
+#+begin_src emacs-lisp
+  (define-key evil-normal-state-map (kbd "C-<backspace>") 'backward-kill-word)
+#+end_src
 ** Save Key
 Instead of using ~C-x C-s~, configure Emacs to use ~C-s~.
 #+begin_src emacs-lisp
@@ -297,10 +304,24 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
 *** Code Shortcuts
 #+begin_src emacs-lisp
   (vvgeneral/code-keys
+
       "c" '(:ignore t :which-key "code actions")
+      ;; LSP Binds
+
+      ;; refrences and defenition
       "cf" '(:ignore t :which-key "find")
       "cfr" '(lsp-find-references :which-key "references")
-      "cfd" '(lsp-find-definition :which-key "references"))
+      "cfd" '(lsp-find-definition :which-key "references")
+      ;; rename
+      "cr" '(:ignore t :which-key "refactor")
+      "crr" '(lsp-rename :which-key "rename")
+      "cro" '(lsp-organize-imports :which-key "organize imports")
+    
+      ;; Dap Mode Debugging Binds
+      "cd" '(:ignore t :which-key "debug actions")
+      "cdb" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
+      "cdd" '(dap-debug :which-key "debug program")
+  )
 #+END_SRC
 *** Roam Shortcuts
 Org Roam Shortcuts use the typical ~C-c~ + key sequence bindings by default. Change them to our ~SPC-r~ + key.
