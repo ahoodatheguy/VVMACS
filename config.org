@@ -43,6 +43,7 @@
   - [[#auto-pairing][Auto Pairing]]
   - [[#code-folding][Code Folding]]
   - [[#language-server-protocol][Language Server Protocol]]
+  - [[#flycheck][Flycheck]]
   - [[#debugging][Debugging]]
   - [[#treemacs][Treemacs]]
   - [[#languages][Languages]]
@@ -80,6 +81,7 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
+(setq use-package-always-ensure t)
 #+end_src
 ** Auto-Updates
 The ~auto-package-update~ package to automatically update all of your packages
@@ -517,7 +519,7 @@ The ~company~ package is used for autocomplete.
 Also use ~company-box~ to add better icons to ~company-mode~ completions
 
 #+begin_src emacs-lisp
-  (use-package company-nox
+  (use-package company-box
     :after company
     :hook (company-mode . company-box-mode))
 #+end_src
@@ -573,6 +575,16 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     :hook (lsp-mode . lsp-ui-mode))
 #+END_SRC
 
+** Flycheck
+~flycheck~ is a useful error/style checking package.
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :after lsp
+    :ensure t
+    :config
+    (flycheck-mode))
+#+end_src
 ** Debugging
 ~dap-mode~ is a package for debugging code in Emacs.
 #+begin_src emacs-lisp
@@ -706,6 +718,7 @@ Built in terminal in Emacs.
 ** Version Control and Project Management
 *** Emacs with Git
 The ~magit~ package brings the Git protocol to Emacs.
+
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
