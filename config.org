@@ -33,7 +33,6 @@
 - [[#split-navigation][Split Navigation]]
 - [[#org-mode][Org Mode]]
   - [[#appearance-1][Appearance]]
-  - [[#note-taking][Note Taking]]
   - [[#src-blocks][SRC Blocks]]
   - [[#org-pandoc][Org-Pandoc]]
   - [[#org-package][Org Package]]
@@ -261,9 +260,6 @@ Package for vim like keybindings with leader keys.
      (general-create-definer vvgeneral/projectile-and-treemacs-keys
     :keymaps '(normal)
     :prefix "SPC")
-     (general-create-definer vvgeneral/roam-keys
-    :keymaps '(normal)
-    :prefix "SPC")
      (general-create-definer vvgeneral/code-keys
     :keymaps '(normal)
     :prefix "SPC")
@@ -323,16 +319,6 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
       "cdd" '(dap-debug :which-key "debug program")
   )
 #+END_SRC
-*** Roam Shortcuts
-Org Roam Shortcuts use the typical ~C-c~ + key sequence bindings by default. Change them to our ~SPC-r~ + key.
-#+begin_src emacs-lisp
-(vvgeneral/roam-keys
-    "r" '(:ignore t :which-key "roam shortcuts")
-    "rf" '(org-roam-node-find :which-key "org-roam-node-find")
-    "rc" '(org-roam-capture :which-key "org-roam-capture")
-    "rl" '(org-roam-node-insert :which-key "org-roam-node-insert")
-)
-#+end_src
 ** Find File
 The default emacs binding for opening a file is ~C-x C-f~, which isn't the best. This line will change it to ~C-o~. (Or ~s-o~ for mac users)
 
@@ -407,26 +393,6 @@ The ~toc-org~ package brings table of contents to org mode.
   (use-package toc-org
     :defer t
     :after org)
-#+end_src
-** Note Taking
-Org Mode is great for note taking when configured properly.
-*** Roam
-#+begin_src emacs-lisp
-(use-package org-roam
-      :ensure t
-      :init
-      (setq org-roam-v2-ack t)
-      :custom
-      (org-roam-directory "~/Documents/Notes/")
-      :bind (("C-c n l" . org-roam-buffer-toggle)
-             ("C-c n f" . org-roam-node-find)
-             ("C-c n g" . org-roam-graph)
-             ("C-c n i" . org-roam-node-insert)
-             ("C-c n c" . org-roam-capture)
-             ;; Dailies
-             ("C-c n j" . org-roam-dailies-capture-today))
-      :config
-      (org-roam-setup))
 #+end_src
 ** SRC Blocks
 *** Code Evaluation
