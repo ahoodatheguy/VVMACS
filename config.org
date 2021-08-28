@@ -5,10 +5,13 @@
 
 * Table of Contents :toc:
 - [[#introduction][Introduction]]
-  - [[#melpa][MELPA]]
   - [[#emacswiki][EmacsWiki]]
+- [[#package-management][Package Management]]
+  - [[#melpa][MELPA]]
+  - [[#auto-updates][Auto-Updates]]
 - [[#appearance][Appearance]]
-  - [[#startup-ui][Startup UI]]
+  - [[#disable-startup-message][Disable Startup Message]]
+  - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
   - [[#text-only-quit-messages][Text Only Quit Messages]]
   - [[#default-font][Default Font]]
@@ -19,7 +22,7 @@
   - [[#line-numbers][Line Numbers]]
   - [[#themes][Themes]]
 - [[#evil-mode][Evil Mode]]
-  - [[#undo-fu][Undo Fu]]
+  - [[#undo-fu][undo-fu]]
 - [[#keys][Keys]]
   - [[#escape-key-escapes][Escape Key Escapes]]
   - [[#save-key][Save Key]]
@@ -39,14 +42,12 @@
   - [[#auto-comment][Auto Comment]]
   - [[#auto-pairing][Auto Pairing]]
   - [[#code-folding][Code Folding]]
-  - [[#language-server][Language Server]]
+  - [[#language-server-protocol][Language Server Protocol]]
+  - [[#debugging][Debugging]]
   - [[#treemacs][Treemacs]]
-  - [[#python][Python]]
-  - [[#shell-scripting][Shell Scripting]]
-  - [[#term-mode][Term Mode]]
-  - [[#vterm][vterm]]
-  - [[#git-integration][Git Integration]]
-  - [[#projectile][Projectile]]
+  - [[#languages][Languages]]
+  - [[#terminals][Terminals]]
+  - [[#version-control-and-project-management][Version Control and Project Management]]
 - [[#daemon-mode][Daemon Mode]]
   - [[#font][Font]]
   - [[#scrollbar][Scrollbar]]
@@ -69,6 +70,10 @@ However, one of the biggest downsides of emacs is it's steep learning curve, the
 This config aims to ease the transition for new users looking to join the Church of Emacs by changing the annoying features and adding the ones that most people looking to start using Emacs would want, while remaining lightweight and straightforward enough to not seem daunting to new users.
 
 But one of the best parts of this configuration for new users is the fact that it is written in Org Mode, the Markdown-like file format native to Emacs. This allows for detailed explanations of each tweak and package installed along with an easy way to navigate the file.
+
+** EmacsWiki
+The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to customize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
+* Package Management
 ** MELPA
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
 #+begin_src emacs-lisp
@@ -76,16 +81,24 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 #+end_src
-** EmacsWiki
-The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to customize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
+** Auto-Updates
+The ~auto-package-update~ package to automatically update all of your packages
+#+begin_src emacs-lisp
+  (use-package auto-package-update
+    :ensure t
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-prompt-before-update t)
+    (auto-package-update-hide-results t))
+#+end_src
 * Appearance
-** Startup UI
-*** Disable Startup Message
+
+** Disable Startup Message
 Disables the default GNU Emacs startup message. This will be replaced with a separate package.
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 #+end_src
-*** Dashboard
+** Dashboard
 This emacs package serves as a better alternative for the standard emacs startup message.
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -127,20 +140,21 @@ Emojis aren't natively supported in Emacs, you need to set the font for them.
 ** Ivy
 Autocomplete for menus like ~M-x~.
 #+begin_src emacs-lisp
-(use-package ivy
-  :diminish
-  :config
-  (ivy-mode 1))
+  (use-package ivy
+    :ensure t
+    :diminish
+    :config
+    (ivy-mode 1))
 #+END_SRC
 ** Swiper
 Swiper is a fuzzy finding search tool to find text within buffers. Think of this like a better Ctrl+F.
 #+begin_src emacs-lisp
-(use-package swiper
-    :defer t)
+  (use-package swiper
+      :defer t)
 
-(if (equal system-type 'darwin)
-    (global-set-key (kbd "s-f") 'counsel-grep-or-swiper)
-    (global-set-key (kbd "C-f") 'counsel-grep-or-swiper))
+  (if (equal system-type 'darwin)
+      (global-set-key (kbd "s-f") 'counsel-grep-or-swiper)   ;; MacOS Bindings
+      (global-set-key (kbd "C-f") 'counsel-grep-or-swiper))  ;; Non Mac bindings
 
 #+END_SRC
 ** Which-Key
@@ -165,14 +179,15 @@ Show line numbers.
 (global-display-line-numbers-mode)
 #+END_SRC
 *** Hide Line Numbers
-Hide line numbers.
+Hide line numbers for certain modes. (e.g org mode, terminal modes)
 #+begin_src emacs-lisp
-(dolist (mode '(org-mode-hook
-    term-mode-hook
-    eshell-mode-hook
-    vterm-mode-hook
-    shell-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (dolist (mode '(org-mode-hook
+      term-mode-hook
+      eshell-mode-hook
+      treemacs-mode-hook
+      vterm-mode-hook
+      shell-mode-hook))
+      (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 ** Themes
 *** Doom-Themes
@@ -196,7 +211,7 @@ Vim keybindings in emacs.
    (evil-set-undo-system 'undo-fu)
    (global-unset-key (kbd "C-o")))
 #+end_src
-** Undo Fu
+** undo-fu
 Add undo framework to evil.
 #+begin_src emacs-lisp
 (use-package undo-fu
@@ -225,22 +240,25 @@ Instead of using ~C-x C-s~, configure Emacs to use ~C-s~.
 ** General.el
 Package for vim like keybindings with leader keys.
 #+begin_src emacs-lisp
-(use-package general
-  :after evil
-  :config
-   (general-create-definer vvgeneral/magit-keys
-  :keymaps '(normal)
-  :prefix "SPC")
-   (general-create-definer vvgeneral/buffer-keys
-  :keymaps '(normal)
-  :prefix "SPC")
-   (general-create-definer vvgeneral/projectile-and-treemacs-keys
-  :keymaps '(normal)
-  :prefix "SPC")
-   (general-create-definer vvgeneral/roam-keys
-  :keymaps '(normal)
-  :prefix "SPC")
-)
+  (use-package general
+    :after evil
+    :config
+     (general-create-definer vvgeneral/magit-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+     (general-create-definer vvgeneral/buffer-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+     (general-create-definer vvgeneral/projectile-and-treemacs-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+     (general-create-definer vvgeneral/roam-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+     (general-create-definer vvgeneral/code-keys
+    :keymaps '(normal)
+    :prefix "SPC")
+  )
 #+END_SRC
 *** Git Shortcuts
 General used with magit allows for operating extremely fast. The leader key for git operations in this configuration is SPC-g.
@@ -267,13 +285,20 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
      "bk"  '(kill-current-buffer :which-key "Kill active buffer")
      "br"  '(rename-buffer :which-key "Rename active buffer"))
 #+END_SRC
-*** Projectile Shortcuts
-This ones pretty simple because projectile has it's own shortcut menu.
+*** Projectile/Treemacs Shortcuts
 #+begin_src emacs-lisp
   (vvgeneral/projectile-and-treemacs-keys
       "p" '(:ignore t :which-key "project actions")
       "pp" '(treemacs :which-key "treemacs")
       "pr" '(projectile-command-map :which-key "projectile commands"))
+#+END_SRC
+*** Code Shortcuts
+#+begin_src emacs-lisp
+  (vvgeneral/code-keys
+      "c" '(:ignore t :which-key "code actions")
+      "cf" '(:ignore t :which-key "find")
+      "cfr" '(lsp-find-references :which-key "references")
+      "cfd" '(lsp-find-definition :which-key "references"))
 #+END_SRC
 *** Roam Shortcuts
 Org Roam Shortcuts use the typical ~C-c~ + key sequence bindings by default. Change them to our ~SPC-r~ + key.
@@ -472,8 +497,10 @@ ERC is Emacs built-in IRC client.
 #+end_src
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
+
 ** Autocomplete
 The ~company~ package is used for autocomplete.
+
 #+begin_src emacs-lisp
 (use-package company
    :after lsp-mode
@@ -486,6 +513,14 @@ The ~company~ package is used for autocomplete.
    :bind (:map company-active-map
             ("<tab>" . company-complete-selection)))   ;; Tab confirms autocomplete
 #+END_SRC
+
+Also use ~company-box~ to add better icons to ~company-mode~ completions
+
+#+begin_src emacs-lisp
+  (use-package company-nox
+    :after company
+    :hook (company-mode . company-box-mode))
+#+end_src
 ** Auto Comment
 Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 #+begin_src emacs-lisp
@@ -498,17 +533,20 @@ Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 (unless (equal system-type 'darwin)
     (global-set-key (kbd "C-/") 'evilnc-comment-or-uncomment-lines))
 #+end_src
+
 ** Auto Pairing
 Automatic pairing of quotes and things.
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 #+end_src
+
 ** Code Folding
 Code folding with evil.
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 #+end_src
-** Language Server
+
+** Language Server Protocol
 Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ is the framework for language servers.
 #+begin_src emacs-lisp
   (use-package lsp-mode
@@ -516,9 +554,11 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
       :defer t
       :commands (lsp-mode lsp lsp-deferred)
       :init
-          (setq lsp-keymap-prefix "C-c l")
+      (setq lsp-keymap-prefix "C-c l")
       :config
       (setq lsp-signature-render-documentation nil)
+      (setq lsp-completion-show-detail nil)  
+      (setq lsp-completion-show-kind nil)
       (setq lsp-signature-auto-activate nil)
       (setq lsp-headerline-breadcrumb-enable nil)
       (lsp-enable-which-key-integration t))
@@ -527,9 +567,18 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     :custom
     (lsp-ui-doc-position 'bottom)
     :config
-    (setq lsp-ui-doc-enable t)
+    (setq lsp-lens-enable t)
+    (setq lsp-ui-doc-enable nil)
+    (setq lsp-ui-sideline-enable t)
     :hook (lsp-mode . lsp-ui-mode))
 #+END_SRC
+
+** Debugging
+~dap-mode~ is a package for debugging code in Emacs.
+#+begin_src emacs-lisp
+(use-package dap-mode)
+#+end_src
+
 ** Treemacs
 Treemacs is a VSCode like sidebar for viewing files in a project.
 #+begin_src emacs-lisp
@@ -540,7 +589,7 @@ Treemacs is a VSCode like sidebar for viewing files in a project.
     (setq treemacs-show-hidden-files t)
     (setq treemacs-width 25))
 #+end_src
-Treemacs icons also kinda suck, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
+Treemacs icons kinda suck though, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
 #+begin_src emacs-lisp
   (use-package treemacs-all-the-icons
     :after treemacs
@@ -548,8 +597,22 @@ Treemacs icons also kinda suck, the ~treemacs-all-the-icons~ package uses all th
     (treemacs-load-theme "all-the-icons")
     :ensure t)
 #+end_src
-** Python
-*** lsp-pyright
+
+** Languages
+*** Python
+Developing in Python is easy with Emacs.
+
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :custom
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+#+end_src
+**** lsp-pyright
 Python's language server
 *NOTE:* On a new install of VVMacs, you might be prompted to install pyright. This is normal.
 #+begin_src emacs-lisp
@@ -560,7 +623,7 @@ Python's language server
             (require 'lsp-pyright)
             (lsp-deferred))))  ; or lsp-deferred
 #+END_SRC
-*** Tabs, Lines, and Pairs
+**** Tabs, Lines, and Pairs
 I also like to code with tabs exclusivley for my indentation. So I'm going to set that up here along with some other neat settings.
 #+begin_src emacs-lisp
 (add-hook 'python-mode-hook
@@ -570,20 +633,69 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
     (setq tab-width 4)
     (toggle-truncate-lines t)))
 #+END_SRC
-** Shell Scripting
-*** bash-ls
-~bash-ls~ is the language server for shell scripting, install it with ~M-x~ RET ~lsp-install-server~ RET ~bash-ls~
-*** Hooks
+**** Dap Mode
+Add the ~dap-python~ module for ~dap-mode~
+#+begin_src emacs-lisp
+(require 'dap-python)
+#+end_src
+*** Shell Scripting
+**** bash-ls
+~bash-ls~ is the language server for shell scripting, install it with ~M-x~ RET ~lsp-install-server~ RET ~bash-ls~ if it doesn't work.
+**** Hooks
+Configure shell scripting experience with ~add-hook~.
 #+begin_src emacs-lisp
   (add-hook 'sh-mode-hook
     (lambda ()
       (setq indent-tabs-mode t)
       (toggle-truncate-lines t)
       (setq tab-width 4)
-      (lsp-mode)))
+      (lsp-deferred)))
 #+end_src
-** Term Mode
+
+** Terminals
+Use the built in terminals in Emacs.
+*** eshell
+The eshell is the Emacs alternative to shells. Since the shell is written in emacs lisp, it offers a lot more customization and integration with Emacs.
+
+The ~eshell-git-prompt~ package adds oh-my-zsh like git information in the prompt, it will also add themes like powerline.
+
+#+begin_src emacs-lisp
+  (use-package eshell-git-prompt
+    :after eshell)
+#+end_src
+
+Next create a function that runs the first time eshell is activated in a session.
+
+#+begin_src emacs-lisp
+  (defun vveshell/configure-eshell ()
+    ;; Save command history when commands are entered
+    (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+    ;; Truncate buffer for performance
+    (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+    ;; Bind some useful keys for evil-mode
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+    (evil-normalize-keymaps)
+
+    (setq eshell-history-size         10000
+          eshell-buffer-maximum-lines 10000
+          eshell-hist-ignoredups t
+          eshell-scroll-to-bottom-on-input t))
+#+end_src
+
+Now hook the function into the eshell and set the prompt theme.
+
+#+begin_src emacs-lisp
+  (use-package eshell
+    :hook (eshell-first-time-mode . vveshell/configure-eshell)
+    :config (eshell-git-prompt-use-theme 'powerline))
+#+end_src
+
+*** term-mode
 Built in terminal in Emacs.
+
 #+begin_src emacs-lisp
 (use-package term
   :config
@@ -591,34 +703,32 @@ Built in terminal in Emacs.
   ;;(setq explicit-zsh-args '())
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
 #+end_src
-** vterm
-A better terminal editor package in emacs. It's up to you which one you want to use.
-*NOTE:* Make sure to install CMake to get it to work.
+** Version Control and Project Management
+*** Emacs with Git
+The ~magit~ package brings the Git protocol to Emacs.
 #+begin_src emacs-lisp
-(use-package vterm
-  :defer t
-  :commands vterm
-  :config
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Match shell prompt
-  (setq vterm-shell "zsh")                       ;; Open zsh shell by default.
-  (setq vterm-max-scrollback 10000))
+  (use-package magit
+    :ensure t
+    :defer t
+    :config
+    (add-hook 'git-commit-mode-hook 'evil-insert-state)  ;; Insert mode when commiting
+
+    ;; Git status Keys
+    (evil-set-initial-state 'magit-status-mode 'normal)
+  )
 #+end_src
-** Git Integration
-~magit~ adds git integration to Emacs.
+*** Projectile
+Projetile is a project management package.
+
 #+begin_src emacs-lisp
-(use-package magit
-  :defer t)
-#+END_SRC
-** Projectile
-~projectile~ is an Emacs package for managing projects.
-#+begin_src emacs-lisp
-(use-package projectile
-  :ensure t
-  :defer t
-  :config (projectile-mode))
-#+END_SRC
+  (use-package projectile
+    :ensure t
+    :defer t
+    :config (projectile-mode))
+#+end_src
 * Daemon Mode
 Run emacs as a daemon
+
 ** Font
 Emacs in daemon mode has broken fonts.
 #+begin_src emacs-lisp
@@ -648,13 +758,14 @@ Daemon frames are transparent to tell them apart.
     (vvdaemon/transparency))
 #+end_src
 * Misc
+
 ** Discord Rich Presence
 Let your friends know how cool your text editor is.
 #+begin_src emacs-lisp
 (use-package elcord)
 
-(unless (daemonp)
-    (elcord-mode))
+;; (unless (daemonp)
+;;     (elcord-mode))
 #+end_src
 ** Backup Files
 Move backup files to another location.
