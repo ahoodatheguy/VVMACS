@@ -447,23 +447,24 @@ Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mo
 ** Org Package
 And finally add some finishing touches by configuring the Org Mode package itself.
  #+begin_src emacs-lisp
-(defun vv/org-setup ()
-  (org-indent-mode)
-  (visual-line-mode t)
-  (setq evil-auto-indent nil)
-  (setq org-src-ask-before-returning-to-edit-buffer nil))
-(use-package org
-    :hook
-    (org-mode . toc-org-mode)
-    (org-mode . vv/org-font)
-    (org-mode . vv/org-setup)
-    :config
-    (setq org-ellipsis " ⤸")
-    (setq org-hide-emphasis-markers t)
-    (setq org-support-shift-select t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-startup-folded t)
-    (setq org-startup-indented t))
+   (defun vv/org-setup ()
+     (org-indent-mode)
+     (visual-line-mode t)
+     (setq evil-auto-indent nil)
+     (setq org-src-ask-before-returning-to-edit-buffer nil))
+   (use-package org
+       :hook
+       (org-mode . toc-org-mode)
+       (org-mode . vv/org-font)
+       (org-mode . vv/org-setup)
+       :config
+       (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))  ;; Change LaTeX preview size
+       (setq org-ellipsis " ⤸")
+       (setq org-hide-emphasis-markers t)
+       (setq org-support-shift-select t)
+       (setq org-src-tab-acts-natively t)
+       (setq org-startup-folded t)
+       (setq org-startup-indented t))
 #+END_SRC
 * ERC
 ERC is Emacs built-in IRC client.
