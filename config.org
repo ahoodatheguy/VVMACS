@@ -121,7 +121,7 @@ The ~doom-modeline~ package is from Doom Emacs. It displays useful information s
   :ensure t
   :init (doom-modeline-mode)
   :config
-  (setq doom-modeline-env-python-executable "python"))
+  (setq doom-modeline-env-python-executable "python3"))
 #+END_SRC
 ** Text Only Quit Messages
 Replace the annoying popup that appears whenever attempting to close a window with a text confirm message.
