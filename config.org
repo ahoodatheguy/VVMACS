@@ -21,14 +21,15 @@
   - [[#rainbow-delimeters][Rainbow Delimeters]]
   - [[#line-numbers][Line Numbers]]
   - [[#themes][Themes]]
-- [[#evil-mode][Evil Mode]]
+- [[#evil-mode][evil-mode]]
   - [[#undo-fu][undo-fu]]
-- [[#keys][Keys]]
+- [[#generalel][general.el]]
+- [[#helpful][helpful]]
+- [[#standardized-keys][Standardized Keys]]
   - [[#escape-key-escapes][Escape Key Escapes]]
   - [[#delete-word-with-c-backspace][Delete Word with C-Backspace]]
   - [[#save-key][Save Key]]
   - [[#select-all-key][Select All Key]]
-  - [[#generalel][General.el]]
   - [[#find-file][Find File]]
 - [[#split-navigation][Split Navigation]]
 - [[#org-mode][Org Mode]]
@@ -77,6 +78,7 @@ The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources 
 * Package Management
 ** MELPA
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
+
 #+begin_src emacs-lisp
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -85,6 +87,7 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
 #+end_src
 ** Auto-Updates
 The ~auto-package-update~ package to automatically update all of your packages
+
 #+begin_src emacs-lisp
   (use-package auto-package-update
     :ensure t
@@ -97,11 +100,13 @@ The ~auto-package-update~ package to automatically update all of your packages
 
 ** Disable Startup Message
 Disables the default GNU Emacs startup message. This will be replaced with a separate package.
+
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 #+end_src
 ** Dashboard
 This emacs package serves as a better alternative for the standard emacs startup message.
+
 #+begin_src emacs-lisp
 (use-package dashboard
     :ensure t
@@ -116,6 +121,7 @@ This emacs package serves as a better alternative for the standard emacs startup
 #+end_src
 ** Modeline
 The ~doom-modeline~ package is from Doom Emacs. It displays useful information such as the filename, encoding, and even email notifications.
+
 #+begin_src emacs-lisp
 (use-package doom-modeline
   :ensure t
@@ -125,6 +131,7 @@ The ~doom-modeline~ package is from Doom Emacs. It displays useful information s
 #+END_SRC
 ** Text Only Quit Messages
 Replace the annoying popup that appears whenever attempting to close a window with a text confirm message.
+
 #+begin_src emacs-lisp
 (setq use-dialog-box nil)
 #+END_SRC
@@ -134,6 +141,7 @@ Replace the annoying popup that appears whenever attempting to close a window wi
 #+END_SRC
 *** Emoji Font
 Emojis aren't natively supported in Emacs, you need to set the font for them.
+
 #+begin_src emacs-lisp
 (when (member "Apple Color Emoji" (font-family-list))
   (set-fontset-font
@@ -141,6 +149,7 @@ Emojis aren't natively supported in Emacs, you need to set the font for them.
 #+end_src
 ** Ivy
 Autocomplete for menus like ~M-x~.
+
 #+begin_src emacs-lisp
   (use-package ivy
     :ensure t
@@ -150,6 +159,7 @@ Autocomplete for menus like ~M-x~.
 #+END_SRC
 ** Swiper
 Swiper is a fuzzy finding search tool to find text within buffers. Think of this like a better Ctrl+F.
+
 #+begin_src emacs-lisp
   (use-package swiper
       :defer t)
@@ -161,6 +171,7 @@ Swiper is a fuzzy finding search tool to find text within buffers. Think of this
 #+END_SRC
 ** Which-Key
 Show keybindings in minibuffer.
+
 #+begin_src emacs-lisp
 (use-package which-key
   :init
@@ -170,6 +181,7 @@ Show keybindings in minibuffer.
 #+END_SRC
 ** Rainbow Delimeters
 Rainbow colored parenthasees, brackets, and braces.
+
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
     :defer t
@@ -177,11 +189,13 @@ Rainbow colored parenthasees, brackets, and braces.
 #+END_SRC
 ** Line Numbers
 Show line numbers.
+
 #+begin_src emacs-lisp
 (global-display-line-numbers-mode)
 #+END_SRC
 *** Hide Line Numbers
 Hide line numbers for certain modes. (e.g org mode, terminal modes)
+
 #+begin_src emacs-lisp
   (dolist (mode '(org-mode-hook
       term-mode-hook
@@ -203,8 +217,9 @@ Load ~doom-snazzy~ from ~doom-themes.~
     (load-theme 'doom-snazzy t))
 #+END_SRC
 
-* Evil Mode
+* evil-mode
 Vim keybindings in emacs.
+
 #+begin_src emacs-lisp
   (use-package evil
      :ensure t
@@ -222,38 +237,14 @@ Vim keybindings in emacs.
 #+end_src
 ** undo-fu
 Add undo framework to evil.
+
 #+begin_src emacs-lisp
 (use-package undo-fu
     :after evil)
 #+end_src
-* Keys
-Better keybindings for emacs.
-** Escape Key Escapes
-Escape key quits menus.
-#+begin_src emacs-lisp
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-#+END_SRC
-** Delete Word with C-Backspace
-Delete the previous word with ~c-backspace~ like in other apps
-
-#+begin_src emacs-lisp
-  (define-key evil-normal-state-map (kbd "C-<backspace>") 'backward-kill-word)
-#+end_src
-** Save Key
-Instead of using ~C-x C-s~, configure Emacs to use ~C-s~.
-#+begin_src emacs-lisp
-(if (equal system-type 'darwin)
-  (global-set-key (kbd "s-s") 'save-buffer)     ;; macOS save key ⌘
-  (global-set-key (kbd "C-s") 'save-buffer))
-#+END_SRC
-** Select All Key
-~C-a~ selects all text in buffer.
-#+begin_src emacs-lisp
-(unless (equal system-type 'darwin)
-    (define-key evil-insert-state-map (kbd "C-a") 'mark-whole-buffer))
-#+end_src
-** General.el
+* general.el
 Package for vim like keybindings with leader keys.
+
 #+begin_src emacs-lisp
   (use-package general
     :after evil
@@ -273,7 +264,9 @@ Package for vim like keybindings with leader keys.
   )
 #+END_SRC
 *** Git Shortcuts
-General used with magit allows for operating extremely fast. The leader key for git operations in this configuration is SPC-g.
+General used with magit allows for operating extremely fast. The leader
+key for git operations in this configuration is SPC-g.
+
 #+begin_src emacs-lisp
 (vvgeneral/magit-keys
   "g" '(:ignore t :which-key "magit shortcuts")
@@ -290,6 +283,7 @@ General used with magit allows for operating extremely fast. The leader key for 
 #+END_SRC
 *** Buffer Shortcuts
 Buffer management in Emacs isn't really the most friendly out of the box. The keybindings are confusing and difficult to execute. Let's fix that with general leader keys.
+
 #+begin_src emacs-lisp
  (vvgeneral/buffer-keys
      "b" '(:ignore t :which-key "buffer shortcuts")
@@ -326,17 +320,64 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
       "cdd" '(dap-debug :which-key "debug program")
   )
 #+END_SRC
+* helpful
+~helpful~ gives better help menus and documentation in Emacs.
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :commands (helpful-callable helpful-variable helpful-command helpful-key)
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+#+end_src
+* Standardized Keys
+Make keybindings that work like other programs.
+
+** Escape Key Escapes
+Escape key quits menus.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+** Delete Word with C-Backspace
+Delete the previous word with ~c-backspace~ like in other apps
+
+#+begin_src emacs-lisp
+  (define-key evil-normal-state-map (kbd "C-<backspace>") 'backward-kill-word)
+#+end_src
+** Save Key
+Instead of using ~C-x C-s~, configure Emacs to use ~C-s~.
+
+#+begin_src emacs-lisp
+(if (equal system-type 'darwin)
+  (global-set-key (kbd "s-s") 'save-buffer)     ;; macOS save key ⌘
+  (global-set-key (kbd "C-s") 'save-buffer))
+#+END_SRC
+** Select All Key
+~C-a~ selects all text in buffer.
+
+#+begin_src emacs-lisp
+(unless (equal system-type 'darwin)
+    (define-key evil-insert-state-map (kbd "C-a") 'mark-whole-buffer))
+#+end_src
 ** Find File
 The default emacs binding for opening a file is ~C-x C-f~, which isn't the best. This line will change it to ~C-o~. (Or ~s-o~ for mac users)
 
-(Note: For non-macOS users, the ~C-o~ binding can only be used in normal mode due to it being an already existing keybind.)
+*NOTE:* For non-macOS users, the ~C-o~ binding can only be used in normal mode due to it being an already existing keybind.
 #+begin_src emacs-lisp
 (if (equal system-type 'darwin)
     (global-set-key (kbd "s-o") 'find-file)     ;; macOS find file key ⌘
     (evil-define-key 'normal 'global (kbd "C-o") 'find-file))
 #+end_src
+
 * Split Navigation
 Use vim-like navigation to change splits.
+
 #+begin_src emacs-lisp
   (unless (equal system-type 'darwin)
       (progn
@@ -355,10 +396,13 @@ Use vim-like navigation to change splits.
 #+END_SRC
 * Org Mode
 Various tweaks to improve Org-Mode.
+
 ** Appearance
-Make Org Mode look nice
+Make Org Mode look nice.
+
 *** Org Superstar
 ~org-superstar~ is used for custom bullet points and titles.
+
 #+begin_src emacs-lisp
 (use-package org-superstar
     :defer t
@@ -371,6 +415,7 @@ Make Org Mode look nice
 #+END_SRC
 *** Margins
 Second, lets put some margins on Org Mode so it looks like a real document.
+
 #+begin_src emacs-lisp
   (defun vv/org-mode-visual-fill ()
      (setq visual-fill-column-width 100
@@ -382,6 +427,7 @@ Second, lets put some margins on Org Mode so it looks like a real document.
 #+END_SRC
 *** Header Font
 Custom fonts for headers. Uses Roboto.
+
 #+begin_src emacs-lisp
   (defun vv/org-font ()
       (dolist (face '((org-level-1 . 1.2)
@@ -396,6 +442,7 @@ Custom fonts for headers. Uses Roboto.
 #+END_SRC
 *** Table of Contents
 The ~toc-org~ package brings table of contents to org mode.
+
 #+begin_src emacs-lisp
   (use-package toc-org
     :defer t
@@ -404,6 +451,7 @@ The ~toc-org~ package brings table of contents to org mode.
 ** SRC Blocks
 *** Code Evaluation
 Org Mode can be used like Jupyter Notebooks in the sense that code can be written in executed directly inside of Org. You can run these code blocks with ~C-c C-C~
+
 *NOTE:* Mac users may get a warning upon running a python code block. This is normal, just close the buffer.
 #+begin_src emacs-lisp
   (require 'ob-shell)  ;; Required for shell scripting.
@@ -421,6 +469,7 @@ Org Mode can be used like Jupyter Notebooks in the sense that code can be writte
 
 #+end_src
 Whenever you attempt to run a code block, youll get a warning. It's up to you whether or not you want this as it can help security. But for conveniences sake, it's disabled by default.
+
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
 #+end_src
@@ -435,6 +484,7 @@ To activiate it within a python src block,
 #+end_src
 *** SRC Block Shortcuts
 Easy ways to create src blocks. 
+
 #+begin_src emacs-lisp
   (require 'org-tempo)
 
@@ -446,13 +496,14 @@ Easy ways to create src blocks.
 ** Org-Pandoc
 Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
 
-*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.)
+*NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.
 #+begin_src emacs-lisp
 (use-package ox-pandoc
     :defer t)
 #+END_SRC
 ** Org Package
 And finally add some finishing touches by configuring the Org Mode package itself.
+
  #+begin_src emacs-lisp
    (defun vv/org-setup ()
      (org-indent-mode)
@@ -520,6 +571,7 @@ Also use ~company-box~ to add better icons to ~company-mode~ completions
 #+end_src
 ** Auto Comment
 Use ~C-/~ (or ~s-/~ on macs) to comment a line.
+
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
     :after evil
@@ -533,18 +585,21 @@ Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 
 ** Auto Pairing
 Automatic pairing of quotes and things.
+
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 #+end_src
 
 ** Code Folding
 Code folding with evil.
+
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 #+end_src
 
 ** Language Server Protocol
 Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ is the framework for language servers.
+
 #+begin_src emacs-lisp
   (use-package lsp-mode
       :ensure t
@@ -582,12 +637,14 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
 #+end_src
 ** Debugging
 ~dap-mode~ is a package for debugging code in Emacs.
+
 #+begin_src emacs-lisp
 (use-package dap-mode)
 #+end_src
 
 ** Treemacs
 Treemacs is a VSCode like sidebar for viewing files in a project.
+
 #+begin_src emacs-lisp
   (use-package treemacs
     :defer t
@@ -621,6 +678,7 @@ Developing in Python is easy with Emacs.
 #+end_src
 **** lsp-pyright
 Python's language server
+
 *NOTE:* On a new install of VVMacs, you might be prompted to install pyright. This is normal.
 #+begin_src emacs-lisp
 (use-package lsp-pyright
@@ -632,6 +690,7 @@ Python's language server
 #+END_SRC
 **** Tabs, Lines, and Pairs
 I also like to code with tabs exclusivley for my indentation. So I'm going to set that up here along with some other neat settings.
+
 #+begin_src emacs-lisp
 (add-hook 'python-mode-hook
   (lambda ()
@@ -642,6 +701,7 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
 #+END_SRC
 **** Dap Mode
 Add the ~dap-python~ module for ~dap-mode~
+
 #+begin_src emacs-lisp
 (require 'dap-python)
 #+end_src
@@ -650,6 +710,7 @@ Add the ~dap-python~ module for ~dap-mode~
 ~bash-ls~ is the language server for shell scripting, install it with ~M-x~ RET ~lsp-install-server~ RET ~bash-ls~ if it doesn't work.
 **** Hooks
 Configure shell scripting experience with ~add-hook~.
+
 #+begin_src emacs-lisp
   (add-hook 'sh-mode-hook
     (lambda ()
@@ -739,24 +800,28 @@ Run emacs as a daemon
 
 ** Font
 Emacs in daemon mode has broken fonts.
+
 #+begin_src emacs-lisp
 (if (daemonp)
     (setq default-frame-alist '((font . "Fira Code-18"))))
 #+end_src
 ** Scrollbar
 Disable the scrollbar.
+
 #+begin_src emacs-lisp
 (if (daemonp)
    (scroll-bar-mode -1)) 
 #+end_src
 ** Modeline Icon
 The modeline doesn't show icons by default when emacs is run as a daemon.
+
 #+begin_src emacs-lisp
 (if (daemonp)
     (setq doom-modeline-icon t))
 #+end_src
 ** Transparency
 Daemon frames are transparent to tell them apart.
+
 #+begin_src emacs-lisp
 (defun vvdaemon/transparency ()
  (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
@@ -766,9 +831,11 @@ Daemon frames are transparent to tell them apart.
     (vvdaemon/transparency))
 #+end_src
 * Misc
+I didn't know where to put these changes.
 
 ** Discord Rich Presence
 Let your friends know how cool your text editor is.
+
 #+begin_src emacs-lisp
 (use-package elcord)
 
@@ -777,10 +844,12 @@ Let your friends know how cool your text editor is.
 #+end_src
 ** Backup Files
 Move backup files to another location.
+
 #+begin_src emacs-lisp
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
 #+END_SRC
-Disable lockfiles too.s
+Disable lockfiles too.
+
 #+begin_src emacs-lisp
 (setq create-lockfiles nil)
 #+END_SRC
@@ -791,6 +860,7 @@ Disable lockfiles too.s
 ** macOS Fixes
 *** $PATH fixes
 lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a lot.
+
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
     :ensure t)
@@ -818,6 +888,7 @@ lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a
 #+END_SRC
 ** YASnippet
 Add code snippets easily.
+
 [[https://www.youtube.com/watch?v=W-bRZlseNm0][Watch a YASnippet tutorial here.]]
 #+begin_src emacs-lisp
 (use-package yasnippet
@@ -826,6 +897,7 @@ Add code snippets easily.
     (yas-global-mode 1))
 #+end_src
 YASnippet sometimes tries to auto-indent snippets, which can mess up our already indented snippets. Luckily, the auto-indent setting is assigned to a variable so we can easily disable it.
+
 #+begin_src emacs-lisp
 (setq yas-indent-line 'fixed)
 #+end_src
