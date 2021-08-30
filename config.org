@@ -193,15 +193,16 @@ Hide line numbers for certain modes. (e.g org mode, terminal modes)
 #+END_SRC
 ** Themes
 *** Doom-Themes
-The ~doom-themes~ package is a collection of popular themes.
+Load ~doom-snazzy~ from ~doom-themes.~
+
 #+begin_src emacs-lisp
-(use-package doom-themes)
+  (use-package doom-themes
+    :ensure t
+    :if (display-graphic-p)
+    :config
+    (load-theme 'doom-snazzy t))
 #+END_SRC
-*** Set Default Theme
-Set the theme to ~doom-snazzy~ automatically.
-#+begin_src emacs-lisp
-(load-theme 'doom-snazzy t)
-#+END_SRC
+
 * Evil Mode
 Vim keybindings in emacs.
 #+begin_src emacs-lisp
@@ -365,7 +366,7 @@ Make Org Mode look nice
     :config
     (org-superstar-configure-like-org-bullets)
     (setq inhibit-compacting-font-caches t)
-    (setq org-superstar-headline-bullets-list '("●" "—" "+"))
+    (setq org-superstar-headline-bullets-list '("●" "⦿" "—" "+"))
     (setq org-hidden-keywords '(title)))
 #+END_SRC
 *** Margins
