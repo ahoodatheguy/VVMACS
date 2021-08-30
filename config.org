@@ -215,6 +215,9 @@ Load ~doom-snazzy~ from ~doom-themes.~
     :if (display-graphic-p)
     :config
     (load-theme 'doom-snazzy t))
+
+  (if (daemonp)
+      (load-theme 'doom-snazzy t))
 #+END_SRC
 
 * evil-mode
