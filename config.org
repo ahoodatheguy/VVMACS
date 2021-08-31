@@ -413,7 +413,7 @@ Make Org Mode look nice.
     :config
     (org-superstar-configure-like-org-bullets)
     (setq inhibit-compacting-font-caches t)
-    (setq org-superstar-headline-bullets-list '("●" "⦿" "—" "+"))
+    (setq org-superstar-headline-bullets-list '("⦿" "►" "○"))
     (setq org-hidden-keywords '(title)))
 #+END_SRC
 *** Margins
