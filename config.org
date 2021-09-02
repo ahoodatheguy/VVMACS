@@ -13,7 +13,6 @@
   - [[#disable-startup-message][Disable Startup Message]]
   - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
-  - [[#text-only-quit-messages][Text Only Quit Messages]]
   - [[#default-font][Default Font]]
   - [[#ivy][Ivy]]
   - [[#swiper][Swiper]]
@@ -21,6 +20,11 @@
   - [[#rainbow-delimeters][Rainbow Delimeters]]
   - [[#line-numbers][Line Numbers]]
   - [[#themes][Themes]]
+- [[#prompts][Prompts]]
+  - [[#text-only-quit-messages][Text Only Quit Messages]]
+  - [[#y-or-n][Y or N]]
+  - [[#create-nonexistent-files][Create nonexistent files]]
+  - [[#kill-live-buffer][Kill live buffer]]
 - [[#evil-mode][evil-mode]]
   - [[#undo-fu][undo-fu]]
 - [[#generalel][general.el]]
@@ -129,12 +133,6 @@ The ~doom-modeline~ package is from Doom Emacs. It displays useful information s
   :config
   (setq doom-modeline-env-python-executable "python3"))
 #+END_SRC
-** Text Only Quit Messages
-Replace the annoying popup that appears whenever attempting to close a window with a text confirm message.
-
-#+begin_src emacs-lisp
-(setq use-dialog-box nil)
-#+END_SRC
 ** Default Font
 #+begin_src emacs-lisp
 (set-frame-font "Fira Code-18" nil t)
@@ -220,6 +218,35 @@ Load ~doom-snazzy~ from ~doom-themes.~
       (load-theme 'doom-snazzy t))
 #+END_SRC
 
+* Prompts
+Configure the way Emacs uses prompts.
+
+** Text Only Quit Messages
+Replace the annoying popup that appears whenever attempting to close a window with a text confirm message.
+
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+END_SRC
+** Y or N
+Typically prompts will ask for a yes or no answer, this is fine, but pressing y or n is obviously quicker.
+
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+** Create nonexistent files
+By default Emacs prompts you whenever you attempt to create a new file. It makes no sense though, so lets disable it.
+
+#+begin_src emacs-lisp
+(setq confirm-nonexistent-file-or-buffer nil)
+#+end_src
+** Kill live buffer
+When a buffer has a running process in it like the Python shell, attempting to quit will raise a prompt. Again, pointless, so I'm going to remove it.
+
+#+begin_src emacs-lisp
+(setq kill-buffer-query-functions
+  (remq 'process-kill-buffer-query-function
+         kill-buffer-query-functions))
+#+end_src
 * evil-mode
 Vim keybindings in emacs.
 
@@ -429,7 +456,7 @@ Second, lets put some margins on Org Mode so it looks like a real document.
      :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
 *** Header Font
-Custom fonts for headers. Uses Roboto.
+Custom fonts for headers. Uses Cantarell.
 
 #+begin_src emacs-lisp
   (defun vv/org-font ()
@@ -441,7 +468,7 @@ Custom fonts for headers. Uses Roboto.
       (org-level-6 . 1.1)
       (org-level-7 . 1.1)
       (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Roboto" :weight 'regular :height (cdr face))))
+      (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
 #+END_SRC
 *** Table of Contents
 The ~toc-org~ package brings table of contents to org mode.
@@ -508,24 +535,25 @@ Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mo
 And finally add some finishing touches by configuring the Org Mode package itself.
 
  #+begin_src emacs-lisp
-   (defun vv/org-setup ()
-     (org-indent-mode)
-     (visual-line-mode t)
-     (setq evil-auto-indent nil)
-     (setq org-src-ask-before-returning-to-edit-buffer nil))
-   (use-package org
-       :hook
-       (org-mode . toc-org-mode)
-       (org-mode . vv/org-font)
-       (org-mode . vv/org-setup)
-       :config
-       (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))  ;; Change LaTeX preview size
-       (setq org-ellipsis " ⤸")
-       (setq org-hide-emphasis-markers t)
-       (setq org-support-shift-select t)
-       (setq org-src-tab-acts-natively t)
-       (setq org-startup-folded t)
-       (setq org-startup-indented t))
+      (defun vv/org-setup ()
+        (org-indent-mode)
+        (visual-line-mode t)
+        (setq evil-auto-indent nil)
+        (setq org-src-ask-before-returning-to-edit-buffer nil))
+      (use-package org
+          :hook
+          (org-mode . toc-org-mode)
+          (org-mode . vv/org-font)
+          (org-mode . vv/org-setup)
+          :config
+          (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))  ;; Change LaTeX preview size
+          (setq org-image-actual-width nil)
+          (setq org-ellipsis " ⤸")
+          (setq org-hide-emphasis-markers t)
+          (setq org-support-shift-select t)
+          (setq org-src-tab-acts-natively t)
+          (setq org-startup-folded t)
+          (setq org-startup-indented t))
 #+END_SRC
 * ERC
 ERC is Emacs built-in IRC client.
@@ -553,16 +581,18 @@ Until now, this config has mostly been about making Emacs look nice and adding k
 The ~company~ package is used for autocomplete.
 
 #+begin_src emacs-lisp
-(use-package company
-   :after lsp-mode
-   :ensure t
-   :defer t
-   :hook (lsp-mode . company-mode)
-   :custom
-   (company-minimum-prefix-length 1)
-   (company-idle-delay 0.0)
-   :bind (:map company-active-map
-            ("<tab>" . company-complete-selection)))   ;; Tab confirms autocomplete
+  (use-package company
+     :after lsp-mode
+     :ensure t
+     :defer t
+     :hook (lsp-mode . company-mode)
+     :config
+     (add-to-list 'company-backends 'company-files)
+     :custom
+     (company-minimum-prefix-length 1)
+     (company-idle-delay 0.0)
+     :bind (:map company-active-map
+              ("<tab>" . company-complete-selection)))   ;; Tab confirms autocomplete
 #+END_SRC
 
 Also use ~company-box~ to add better icons to ~company-mode~ completions
