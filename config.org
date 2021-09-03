@@ -2,7 +2,6 @@
 #+STARTUP: hideblocks
 #+OPTIONS: toc:2
 
-
 * Table of Contents :toc:
 - [[#introduction][Introduction]]
   - [[#emacswiki][EmacsWiki]]
@@ -14,7 +13,6 @@
   - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
   - [[#default-font][Default Font]]
-  - [[#ivy][Ivy]]
   - [[#swiper][Swiper]]
   - [[#which-key][Which-Key]]
   - [[#rainbow-delimeters][Rainbow Delimeters]]
@@ -25,6 +23,9 @@
   - [[#y-or-n][Y or N]]
   - [[#create-nonexistent-files][Create nonexistent files]]
   - [[#kill-live-buffer][Kill live buffer]]
+- [[#completion][Completion]]
+  - [[#ivy-rich][ivy-rich]]
+  - [[#all-the-icons-ivy-rich][all-the-icons-ivy-rich]]
 - [[#evil-mode][evil-mode]]
   - [[#undo-fu][undo-fu]]
 - [[#generalel][general.el]]
@@ -39,16 +40,16 @@
 - [[#org-mode][Org Mode]]
   - [[#appearance-1][Appearance]]
   - [[#src-blocks][SRC Blocks]]
-  - [[#org-pandoc][Org-Pandoc]]
+  - [[#ox-pandoc][ox-pandoc]]
   - [[#org-package][Org Package]]
 - [[#erc][ERC]]
 - [[#development][Development]]
   - [[#autocomplete][Autocomplete]]
-  - [[#auto-comment][Auto Comment]]
+  - [[#evil-nerd-commenter][evil-nerd-commenter]]
   - [[#auto-pairing][Auto Pairing]]
   - [[#code-folding][Code Folding]]
   - [[#language-server-protocol][Language Server Protocol]]
-  - [[#flycheck][Flycheck]]
+  - [[#flycheckel][flycheck.el]]
   - [[#debugging][Debugging]]
   - [[#treemacs][Treemacs]]
   - [[#languages][Languages]]
@@ -59,6 +60,8 @@
   - [[#scrollbar][Scrollbar]]
   - [[#modeline-icon][Modeline Icon]]
   - [[#transparency][Transparency]]
+- [[#optimization][Optimization]]
+  - [[#garbage-collection][Garbage Collection]]
 - [[#misc][Misc]]
   - [[#discord-rich-presence][Discord Rich Presence]]
   - [[#backup-files][Backup Files]]
@@ -75,7 +78,7 @@ However, one of the biggest downsides of emacs is it's steep learning curve, the
 
 This config aims to ease the transition for new users looking to join the Church of Emacs by changing the annoying features and adding the ones that most people looking to start using Emacs would want, while remaining lightweight and straightforward enough to not seem daunting to new users.
 
-But one of the best parts of this configuration for new users is the fact that it is written in Org Mode, the Markdown-like file format native to Emacs. This allows for detailed explanations of each tweak and package installed along with an easy way to navigate the file.
+But one of the best parts of this configuration for new users is the fact that it is written in Org Mode, the Markdown-like file format native to Emacs. This allows for detailed explanations for each tweak and package installed along with an easy way to navigate the file.
 
 ** EmacsWiki
 The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to customize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
@@ -84,16 +87,18 @@ The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources 
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
 
 #+begin_src emacs-lisp
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-(setq use-package-always-ensure t)
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+  (setq use-package-always-ensure t)
+  (package-initialize)
 #+end_src
 ** Auto-Updates
 The ~auto-package-update~ package to automatically update all of your packages
 
 #+begin_src emacs-lisp
   (use-package auto-package-update
+    :defer t
     :ensure t
     :custom
     (auto-package-update-interval 7)
@@ -145,16 +150,6 @@ Emojis aren't natively supported in Emacs, you need to set the font for them.
   (set-fontset-font
    t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+end_src
-** Ivy
-Autocomplete for menus like ~M-x~.
-
-#+begin_src emacs-lisp
-  (use-package ivy
-    :ensure t
-    :diminish
-    :config
-    (ivy-mode 1))
-#+END_SRC
 ** Swiper
 Swiper is a fuzzy finding search tool to find text within buffers. Think of this like a better Ctrl+F.
 
@@ -171,11 +166,12 @@ Swiper is a fuzzy finding search tool to find text within buffers. Think of this
 Show keybindings in minibuffer.
 
 #+begin_src emacs-lisp
-(use-package which-key
-  :init
-  (which-key-mode)
-  :config
-  (setq which-key-idle-delay 0.3))
+  (use-package which-key
+    :defer t
+    :init
+    (which-key-mode)
+    :config
+    (setq which-key-idle-delay 0.3))
 #+END_SRC
 ** Rainbow Delimeters
 Rainbow colored parenthasees, brackets, and braces.
@@ -212,12 +208,11 @@ Load ~doom-snazzy~ from ~doom-themes.~
     :ensure t
     :if (display-graphic-p)
     :config
-    (load-theme 'doom-snazzy t))
+    (load-theme 'doom-palenight t))
 
   (if (daemonp)
-      (load-theme 'doom-snazzy t))
+      (load-theme 'doom-palenight t))
 #+END_SRC
-
 * Prompts
 Configure the way Emacs uses prompts.
 
@@ -247,20 +242,46 @@ When a buffer has a running process in it like the Python shell, attempting to q
   (remq 'process-kill-buffer-query-function
          kill-buffer-query-functions))
 #+end_src
+* Completion
+~ivy~ is an autocompletion framework for emacs.
+
+#+begin_src emacs-lisp
+  (use-package ivy
+    :ensure t
+    :config
+    (ivy-mode 1))
+#+END_SRC
+** ivy-rich
+~ivy-rich~ improves ~ivy~ by giving descriptions to the margins of each autocomplete item.
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :after ivy
+    :config (ivy-rich-mode))
+#+end_src
+** all-the-icons-ivy-rich
+add icons to ~ivy.~
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy-rich
+    :after ivy-rich
+    :config (all-the-icons-ivy-rich-mode))
+#+end_src
 * evil-mode
 Vim keybindings in emacs.
 
 #+begin_src emacs-lisp
   (use-package evil
-     :ensure t
-     :init
-     (setq evil-want-keybinding nil)
-     :config
-     (evil-mode)
-     (evil-set-undo-system 'undo-fu)
-     (global-unset-key (kbd "C-o")))
+    :defer nil
+    :ensure t
+    :init
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode)
+    (evil-set-undo-system 'undo-fu)
+    (global-unset-key (kbd "C-o")))
 
   (use-package evil-collection
+    :after evil
     :ensure t
     :config
     (evil-collection-init))
@@ -298,18 +319,18 @@ General used with magit allows for operating extremely fast. The leader
 key for git operations in this configuration is SPC-g.
 
 #+begin_src emacs-lisp
-(vvgeneral/magit-keys
-  "g" '(:ignore t :which-key "magit shortcuts")
-  "gs" '(magit-status :which-key "git status")
-  "gb" '(magit-branch :which-key "git branch actions")
-  ;; File Shortcuts
-  "gf" '(:ignore t :which-key "file actions")
-  "gfs" '(magit-stage-file :which-key "stage current file")
-  "gfu" '(magit-unstage-file :which-key "unstage current file")
-  "gfr" '(magit-reset :which-key "restore file")
-  ;; Commits
-  "gc" '(magit-commit :which-key "commit actions")
-)
+  (vvgeneral/magit-keys
+    "g" '(:ignore t :which-key "magit shortcuts")
+    "gs" '(magit-status :which-key "git status")
+    "gb" '(magit-branch :which-key "git branch actions")
+    ;; File Shortcuts
+    "gf" '(:ignore t :which-key "file actions")
+    "gfs" '(magit-stage-file :which-key "stage current file")
+    "gfu" '(magit-unstage-file :which-key "unstage current file")
+    "gfr" '(magit-reset :which-key "restore file")
+    ;; Commits
+    "gc" '(magit-commit :which-key "commit actions")
+  )
 #+END_SRC
 *** Buffer Shortcuts
 Buffer management in Emacs isn't really the most friendly out of the box. The keybindings are confusing and difficult to execute. Let's fix that with general leader keys.
@@ -332,23 +353,24 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
 #+begin_src emacs-lisp
   (vvgeneral/code-keys
 
-      "c" '(:ignore t :which-key "code actions")
-      ;; LSP Binds
+    "c" '(:ignore t :which-key "code actions")
+    ;; LSP Binds
 
-      ;; refrences and defenition
-      "cf" '(:ignore t :which-key "find")
-      "cfr" '(lsp-find-references :which-key "references")
-      "cfd" '(lsp-find-definition :which-key "references")
-      ;; rename
-      "cr" '(:ignore t :which-key "refactor")
-      "crr" '(lsp-rename :which-key "rename")
-      "cro" '(lsp-organize-imports :which-key "organize imports")
-    
-      ;; Dap Mode Debugging Binds
-      "cd" '(:ignore t :which-key "debug actions")
-      "cdb" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
-      "cdd" '(dap-debug :which-key "debug program")
-  )
+    ;; refrences and defenition
+    "cf" '(:ignore t :which-key "find")
+    "cfr" '(lsp-find-references :which-key "references")
+    "cfd" '(lsp-find-definition :which-key "references")
+    ;; rename
+    "cr" '(:ignore t :which-key "refactor")
+    "crr" '(lsp-rename :which-key "rename")
+    "cro" '(lsp-organize-imports :which-key "organize imports")
+
+    ;; Dap Mode Debugging Binds
+    "cd" '(:ignore t :which-key "debug actions")
+    "cdb" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
+    "cdd" '(dap-debug-last :which-key "debug program")
+    "cdD" '(dap-debug :which-key "debug (with config)")
+    )
 #+END_SRC
 * helpful
 ~helpful~ gives better help menus and documentation in Emacs.
@@ -430,12 +452,12 @@ Various tweaks to improve Org-Mode.
 ** Appearance
 Make Org Mode look nice.
 
-*** Org Superstar
+*** org-superstar
 ~org-superstar~ is used for custom bullet points and titles.
 
 #+begin_src emacs-lisp
-(use-package org-superstar
-    :defer t
+  (use-package org-superstar
+    :after org
     :hook (org-mode . org-superstar-mode)
     :config
     (org-superstar-configure-like-org-bullets)
@@ -455,6 +477,14 @@ Second, lets put some margins on Org Mode so it looks like a real document.
      :defer t
      :hook (org-mode . vv/org-mode-visual-fill))
 #+END_SRC
+*** Title Font
+Make the Title font look like an actual title. Uses Arial.
+#+begin_src emacs-lisp
+  (custom-set-faces
+   '(org-document-title ((t (:foreground "#ff6ac1" :weight bold :height 1.3 :family "Arial
+  ")))))
+
+#+end_src
 *** Header Font
 Custom fonts for headers. Uses Cantarell.
 
@@ -470,7 +500,7 @@ Custom fonts for headers. Uses Cantarell.
       (org-level-8 . 1.1)))
       (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
 #+END_SRC
-*** Table of Contents
+*** toc-org
 The ~toc-org~ package brings table of contents to org mode.
 
 #+begin_src emacs-lisp
@@ -523,7 +553,7 @@ Easy ways to create src blocks.
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("sh" . "src sh :results output replace"))
 #+end_src
-** Org-Pandoc
+** ox-pandoc
 Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mode files into more standard formats like PDF or Markdown.
 
 *NOTE*: Emacs does have a built-in way to export Org Mode documents, but it doesn't export in nearly enough formats as this package. But if you want to use the default exporter, just input ~C-c C-e~.
@@ -535,25 +565,26 @@ Not everyone uses Emacs however, so we can use ~ox-pandoc~ to convert our org mo
 And finally add some finishing touches by configuring the Org Mode package itself.
 
  #+begin_src emacs-lisp
-      (defun vv/org-setup ()
-        (org-indent-mode)
-        (visual-line-mode t)
-        (setq evil-auto-indent nil)
-        (setq org-src-ask-before-returning-to-edit-buffer nil))
-      (use-package org
-          :hook
-          (org-mode . toc-org-mode)
-          (org-mode . vv/org-font)
-          (org-mode . vv/org-setup)
-          :config
-          (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))  ;; Change LaTeX preview size
-          (setq org-image-actual-width nil)
-          (setq org-ellipsis " ⤸")
-          (setq org-hide-emphasis-markers t)
-          (setq org-support-shift-select t)
-          (setq org-src-tab-acts-natively t)
-          (setq org-startup-folded t)
-          (setq org-startup-indented t))
+   (defun vv/org-setup ()
+     (org-indent-mode)
+     (visual-line-mode t)
+     (setq evil-auto-indent nil)
+     (setq org-src-ask-before-returning-to-edit-buffer nil))
+   (use-package org
+     :defer t
+     :hook
+     (org-mode . toc-org-mode)
+     (org-mode . vv/org-font)
+     (org-mode . vv/org-setup)
+     :config
+     (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))  ;; Change LaTeX preview size
+       (setq org-image-actual-width nil)
+       (setq org-ellipsis " ⤸")
+       (setq org-hide-emphasis-markers t)
+       (setq org-support-shift-select t)
+       (setq org-src-tab-acts-natively t)
+       (setq org-startup-folded t)
+       (setq org-startup-indented t))
 #+END_SRC
 * ERC
 ERC is Emacs built-in IRC client.
@@ -602,7 +633,7 @@ Also use ~company-box~ to add better icons to ~company-mode~ completions
     :after company
     :hook (company-mode . company-box-mode))
 #+end_src
-** Auto Comment
+** evil-nerd-commenter
 Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 
 #+begin_src emacs-lisp
@@ -620,7 +651,7 @@ Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 Automatic pairing of quotes and things.
 
 #+begin_src emacs-lisp
-(add-hook 'prog-mode-hook 'electric-pair-mode)
+(add-hook 'prog-mode-hook 'electric-pair-local-mode)
 #+end_src
 
 ** Code Folding
@@ -658,7 +689,7 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     :hook (lsp-mode . lsp-ui-mode))
 #+END_SRC
 
-** Flycheck
+** flycheck.el
 ~flycheck~ is a useful error/style checking package.
 
 #+begin_src emacs-lisp
@@ -672,7 +703,8 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
 ~dap-mode~ is a package for debugging code in Emacs.
 
 #+begin_src emacs-lisp
-(use-package dap-mode)
+  (use-package dap-mode
+    :defer t)
 #+end_src
 
 ** Treemacs
@@ -686,6 +718,7 @@ Treemacs is a VSCode like sidebar for viewing files in a project.
     (setq treemacs-show-hidden-files t)
     (setq treemacs-width 25))
 #+end_src
+
 Treemacs icons kinda suck though, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
 #+begin_src emacs-lisp
   (use-package treemacs-all-the-icons
@@ -696,11 +729,12 @@ Treemacs icons kinda suck though, the ~treemacs-all-the-icons~ package uses all 
 #+end_src
 
 ** Languages
-*** Python
+*** python-mode
 Developing in Python is easy with Emacs.
 
 #+begin_src emacs-lisp
   (use-package python-mode
+    :defer t
     :ensure t
     :custom
     (python-shell-interpreter "python3")
@@ -863,6 +897,19 @@ Daemon frames are transparent to tell them apart.
 (if (daemonp)
     (vvdaemon/transparency))
 #+end_src
+* Optimization
+Make Emacs run faster and decrease startup time.
+
+Make Emacs startup faster.
+
+** Garbage Collection
+
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold 64000000)
+  (add-hook 'after-init-hook #'(lambda ()
+                                 ;; restore after startup
+                                 (setq gc-cons-threshold 800000)))
+#+end_src
 * Misc
 I didn't know where to put these changes.
 
@@ -895,11 +942,12 @@ Disable lockfiles too.
 lsp-mode doesn't really work with macOS because the $PATH isn't read correctly a lot.
 
 #+begin_src emacs-lisp
-(use-package exec-path-from-shell
+  (use-package exec-path-from-shell
+    :defer t
     :ensure t)
-(if (equal system-type 'darwin)
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize)))
+  (if (equal system-type 'darwin)
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
 #+END_SRC
 ** Prettify Symbols
 *** Org Mode
@@ -924,7 +972,8 @@ Add code snippets easily.
 
 [[https://www.youtube.com/watch?v=W-bRZlseNm0][Watch a YASnippet tutorial here.]]
 #+begin_src emacs-lisp
-(use-package yasnippet
+  (use-package yasnippet
+    :defer t
     :config
     (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
     (yas-global-mode 1))
