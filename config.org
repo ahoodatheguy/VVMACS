@@ -26,6 +26,8 @@
 - [[#completion][Completion]]
   - [[#ivy-rich][ivy-rich]]
   - [[#all-the-icons-ivy-rich][all-the-icons-ivy-rich]]
+  - [[#counsel][counsel]]
+  - [[#ivy-prescient][ivy-prescient]]
 - [[#evil-mode][evil-mode]]
   - [[#undo-fu][undo-fu]]
 - [[#generalel][general.el]]
@@ -266,6 +268,23 @@ add icons to ~ivy.~
     :after ivy-rich
     :config (all-the-icons-ivy-rich-mode))
 #+end_src
+** counsel
+~counsel~ is an add-on for ~ivy~
+
+#+begin_src emacs-lisp
+  (use-package counsel
+    :ensure t
+    :after ivy
+    :config (counsel-mode))
+#+end_src
+** ivy-prescient
+~prescient~ is an add-on for completion 
+
+#+begin_src emacs-lisp
+  (use-package ivy-prescient
+    :after counsel
+    :config (ivy-prescient-mode))
+#+end_src
 * evil-mode
 Vim keybindings in emacs.
 
@@ -300,7 +319,7 @@ Package for vim like keybindings with leader keys.
   (use-package general
     :after evil
     :config
-     (general-create-definer vvgeneral/magit-keys
+     (general-create-definer vvgeneral/git-keys
     :keymaps '(normal)
     :prefix "SPC")
      (general-create-definer vvgeneral/buffer-keys
@@ -319,8 +338,8 @@ General used with magit allows for operating extremely fast. The leader
 key for git operations in this configuration is SPC-g.
 
 #+begin_src emacs-lisp
-  (vvgeneral/magit-keys
-    "g" '(:ignore t :which-key "magit shortcuts")
+  (vvgeneral/git-keys
+    "g" '(:ignore t :which-key "git shortcuts")
     "gs" '(magit-status :which-key "git status")
     "gb" '(magit-branch :which-key "git branch actions")
     ;; File Shortcuts
@@ -330,6 +349,8 @@ key for git operations in this configuration is SPC-g.
     "gfr" '(magit-reset :which-key "restore file")
     ;; Commits
     "gc" '(magit-commit :which-key "commit actions")
+    ;; Search
+    "gg" '(counsel-git-grep :which-key "counsel-git-grep")
   )
 #+END_SRC
 *** Buffer Shortcuts
