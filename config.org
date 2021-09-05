@@ -1,6 +1,6 @@
 #+TITLE:VVMACS Configuration
-#+STARTUP: hideblocks
-#+OPTIONS: toc:2
+#+startup: hideblocks
+#+options: toc:2
 
 * Table of Contents :toc:
 - [[#introduction][Introduction]]
@@ -46,14 +46,14 @@
   - [[#org-package][Org Package]]
 - [[#erc][ERC]]
 - [[#development][Development]]
-  - [[#autocomplete][Autocomplete]]
-  - [[#evil-nerd-commenter][evil-nerd-commenter]]
-  - [[#auto-pairing][Auto Pairing]]
-  - [[#code-folding][Code Folding]]
-  - [[#language-server-protocol][Language Server Protocol]]
+  - [[#companyel][company.el]]
   - [[#flycheckel][flycheck.el]]
-  - [[#debugging][Debugging]]
-  - [[#treemacs][Treemacs]]
+  - [[#treemacsel][treemacs.el]]
+  - [[#evil-nerd-commenter][evil-nerd-commenter]]
+  - [[#electric-pair-local-mode][electric-pair-local-mode]]
+  - [[#hs-minor-mode][hs-minor-mode]]
+  - [[#language-server-protocol][Language Server Protocol]]
+  - [[#debugging-with-dap-mode][Debugging with ~dap-mode~]]
   - [[#languages][Languages]]
   - [[#terminals][Terminals]]
   - [[#version-control-and-project-management][Version Control and Project Management]]
@@ -93,6 +93,7 @@ MELPA is a package repository for Emacs that allows it to use the most popular E
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
   (setq use-package-always-ensure t)
+  (setq use-package-compute-statistics t)
   (package-initialize)
 #+end_src
 ** Auto-Updates
@@ -108,6 +109,7 @@ The ~auto-package-update~ package to automatically update all of your packages
     (auto-package-update-hide-results t))
 #+end_src
 * Appearance
+Make Emacs look like a modern editor and not like something from the 70s.
 
 ** Disable Startup Message
 Disables the default GNU Emacs startup message. This will be replaced with a separate package.
@@ -258,7 +260,10 @@ When a buffer has a running process in it like the Python shell, attempting to q
 #+begin_src emacs-lisp
   (use-package ivy-rich
     :after ivy
-    :config (ivy-rich-mode))
+    :config
+    (ivy-rich-mode)
+    (setq ivy-rich-parse-remote-buffer nil))
+
 #+end_src
 ** all-the-icons-ivy-rich
 add icons to ~ivy.~
@@ -589,6 +594,8 @@ And finally add some finishing touches by configuring the Org Mode package itsel
    (defun vv/org-setup ()
      (org-indent-mode)
      (visual-line-mode t)
+     (setq company-backends '(company-files company-capf))
+     (company-mode)
      (setq evil-auto-indent nil)
      (setq org-src-ask-before-returning-to-edit-buffer nil))
    (use-package org
@@ -629,7 +636,7 @@ ERC is Emacs built-in IRC client.
 * Development
 Until now, this config has mostly been about making Emacs look nice and adding keybinds. But considering how Emacs is a *development* focused editor, there should be basic things that most IDEs have.
 
-** Autocomplete
+** company.el
 The ~company~ package is used for autocomplete.
 
 #+begin_src emacs-lisp
@@ -639,7 +646,7 @@ The ~company~ package is used for autocomplete.
      :defer t
      :hook (lsp-mode . company-mode)
      :config
-     (add-to-list 'company-backends 'company-files)
+     (add-to-list 'company-backends '(company-files))
      :custom
      (company-minimum-prefix-length 1)
      (company-idle-delay 0.0)
@@ -654,6 +661,38 @@ Also use ~company-box~ to add better icons to ~company-mode~ completions
     :after company
     :hook (company-mode . company-box-mode))
 #+end_src
+** flycheck.el
+~flycheck~ is a useful error/style checking package.
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :after lsp
+    :ensure t
+    :config
+    (flycheck-mode))
+#+end_src
+** treemacs.el
+Treemacs is a VSCode like sidebar for viewing files in a project.
+
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :defer t
+    :ensure t
+    :config
+    (setq treemacs-show-hidden-files t)
+    (setq treemacs-width 25))
+#+end_src
+
+Treemacs icons kinda suck though, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-all-the-icons
+    :after treemacs
+    :config
+    (treemacs-load-theme "all-the-icons")
+    :ensure t)
+#+end_src
+
 ** evil-nerd-commenter
 Use ~C-/~ (or ~s-/~ on macs) to comment a line.
 
@@ -668,15 +707,15 @@ Use ~C-/~ (or ~s-/~ on macs) to comment a line.
     (global-set-key (kbd "C-/") 'evilnc-comment-or-uncomment-lines))
 #+end_src
 
-** Auto Pairing
+** electric-pair-local-mode
 Automatic pairing of quotes and things.
 
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'electric-pair-local-mode)
 #+end_src
 
-** Code Folding
-Code folding with evil.
+** hs-minor-mode
+Enabling ~hs-minor-mode~ enables the folding shortcuts in evil mode.
 
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'hs-minor-mode)
@@ -693,12 +732,14 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
       :init
       (setq lsp-keymap-prefix "C-c l")
       :config
+      (setq lsp-keep-workspace-alive nil)
       (setq lsp-signature-render-documentation nil)
       (setq lsp-completion-show-detail nil)  
       (setq lsp-completion-show-kind nil)
       (setq lsp-signature-auto-activate nil)
       (setq lsp-headerline-breadcrumb-enable nil)
       (lsp-enable-which-key-integration t))
+
   (use-package lsp-ui
     :defer t
     :custom
@@ -710,17 +751,7 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     :hook (lsp-mode . lsp-ui-mode))
 #+END_SRC
 
-** flycheck.el
-~flycheck~ is a useful error/style checking package.
-
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :after lsp
-    :ensure t
-    :config
-    (flycheck-mode))
-#+end_src
-** Debugging
+** Debugging with ~dap-mode~
 ~dap-mode~ is a package for debugging code in Emacs.
 
 #+begin_src emacs-lisp
@@ -728,29 +759,8 @@ Language servers are used for linting and autocomplete suggestions. ~lsp-mode~ i
     :defer t)
 #+end_src
 
-** Treemacs
-Treemacs is a VSCode like sidebar for viewing files in a project.
-
-#+begin_src emacs-lisp
-  (use-package treemacs
-    :defer t
-    :ensure t
-    :config
-    (setq treemacs-show-hidden-files t)
-    (setq treemacs-width 25))
-#+end_src
-
-Treemacs icons kinda suck though, the ~treemacs-all-the-icons~ package uses all the icons as a backend for icon rendering to fix it.
-#+begin_src emacs-lisp
-  (use-package treemacs-all-the-icons
-    :after treemacs
-    :config
-    (treemacs-load-theme "all-the-icons")
-    :ensure t)
-#+end_src
-
 ** Languages
-*** python-mode
+*** Python
 Developing in Python is easy with Emacs.
 
 #+begin_src emacs-lisp
@@ -788,7 +798,7 @@ I also like to code with tabs exclusivley for my indentation. So I'm going to se
     (toggle-truncate-lines t)))
 #+END_SRC
 **** Dap Mode
-Add the ~dap-python~ module for ~dap-mode~
+Add the ~dap-python~ module for ~dap-mode.~
 
 #+begin_src emacs-lisp
 (require 'dap-python)
@@ -807,7 +817,6 @@ Configure shell scripting experience with ~add-hook~.
       (setq tab-width 4)
       (lsp-deferred)))
 #+end_src
-
 ** Terminals
 Use the built in terminals in Emacs.
 *** eshell
@@ -860,7 +869,7 @@ Built in terminal in Emacs.
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
 #+end_src
 ** Version Control and Project Management
-*** Emacs with Git
+*** magit.el
 The ~magit~ package brings the Git protocol to Emacs.
 
 #+begin_src emacs-lisp
@@ -874,7 +883,7 @@ The ~magit~ package brings the Git protocol to Emacs.
     (evil-set-initial-state 'magit-status-mode 'normal)
   )
 #+end_src
-*** Projectile
+*** projectile.el
 Projetile is a project management package.
 
 #+begin_src emacs-lisp
@@ -887,7 +896,7 @@ Projetile is a project management package.
 Run emacs as a daemon
 
 ** Font
-Emacs in daemon mode has broken fonts.
+Emacs in daemon configures fonts a little differently from normal.
 
 #+begin_src emacs-lisp
 (if (daemonp)
@@ -908,7 +917,7 @@ The modeline doesn't show icons by default when emacs is run as a daemon.
     (setq doom-modeline-icon t))
 #+end_src
 ** Transparency
-Daemon frames are transparent to tell them apart.
+Daemon frames are transparent to tell them apart from non-daemon frames.
 
 #+begin_src emacs-lisp
 (defun vvdaemon/transparency ()
@@ -921,10 +930,7 @@ Daemon frames are transparent to tell them apart.
 * Optimization
 Make Emacs run faster and decrease startup time.
 
-Make Emacs startup faster.
-
 ** Garbage Collection
-
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 64000000)
   (add-hook 'after-init-hook #'(lambda ()
