@@ -30,6 +30,7 @@
   - [[#ivy-prescient][ivy-prescient]]
 - [[#evil-mode][evil-mode]]
   - [[#undo-fu][undo-fu]]
+  - [[#helpful-bindings][Helpful Bindings]]
 - [[#generalel][general.el]]
 - [[#helpful][helpful]]
 - [[#standardized-keys][Standardized Keys]]
@@ -317,6 +318,12 @@ Add undo framework to evil.
 (use-package undo-fu
     :after evil)
 #+end_src
+** Helpful Bindings
+Some helpful bindings to use with =evil-normal-state=
+#+begin_src emacs-lisp
+(define-key evil-normal-state-map (kbd "gr") 'lsp-find-references) ;; Find References
+(define-key evil-normal-state-map (kbd "gd") 'lsp-find-definition) ;; Find Definition
+#+end_src
 * general.el
 Package for vim like keybindings with leader keys.
 
@@ -374,29 +381,6 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
       "p" '(:ignore t :which-key "project actions")
       "pp" '(treemacs :which-key "treemacs")
       "pr" '(projectile-command-map :which-key "projectile commands"))
-#+END_SRC
-*** Code Shortcuts
-#+begin_src emacs-lisp
-  (vvgeneral/code-keys
-
-    "c" '(:ignore t :which-key "code actions")
-    ;; LSP Binds
-
-    ;; refrences and defenition
-    "cf" '(:ignore t :which-key "find")
-    "cfr" '(lsp-find-references :which-key "references")
-    "cfd" '(lsp-find-definition :which-key "references")
-    ;; rename
-    "cr" '(:ignore t :which-key "refactor")
-    "crr" '(lsp-rename :which-key "rename")
-    "cro" '(lsp-organize-imports :which-key "organize imports")
-
-    ;; Dap Mode Debugging Binds
-    "cd" '(:ignore t :which-key "debug actions")
-    "cdb" '(dap-breakpoint-toggle :which-key "toggle breakpoint")
-    "cdd" '(dap-debug-last :which-key "debug program")
-    "cdD" '(dap-debug :which-key "debug (with config)")
-    )
 #+END_SRC
 * helpful
 ~helpful~ gives better help menus and documentation in Emacs.
@@ -803,6 +787,19 @@ Add the ~dap-python~ module for ~dap-mode.~
 #+begin_src emacs-lisp
 (require 'dap-python)
 #+end_src
+**** Virtual Environments
+Use =pipenv= to manage virtual environments.
+
+*NOTE:* Make sure pipenv is actually installed and added to the =$PATH=.
+#+begin_src emacs-lisp
+  (use-package pipenv
+    :hook (python-mode . pipenv-mode)
+    :init
+    (setq
+     pipenv-projectile-after-switch-function
+     #'pipenv-projectile-after-switch-extended))
+#+end_src
+
 *** Shell Scripting
 **** bash-ls
 ~bash-ls~ is the language server for shell scripting, install it with ~M-x~ RET ~lsp-install-server~ RET ~bash-ls~ if it doesn't work.
