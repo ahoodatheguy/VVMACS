@@ -499,7 +499,7 @@ Make the Title font look like an actual title. Uses Arial.
 Custom fonts for headers. Uses Cantarell.
 
 #+begin_src emacs-lisp
-  (defun vv/org-font ()
+(defun vv/org-font ()
       (dolist (face '((org-level-1 . 1.2)
       (org-level-2 . 1.1)
       (org-level-3 . 1.05)
@@ -508,7 +508,7 @@ Custom fonts for headers. Uses Cantarell.
       (org-level-6 . 1.1)
       (org-level-7 . 1.1)
       (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
+      (set-face-attribute (car face) nil :font "FreeSans" :weight 'regular :height (cdr face))))
 #+END_SRC
 *** toc-org
 The ~toc-org~ package brings table of contents to org mode.
