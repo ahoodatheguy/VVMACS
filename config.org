@@ -3,8 +3,6 @@
 #+options: toc:2
 
 * Table of Contents :toc:
-- [[#introduction][Introduction]]
-  - [[#emacswiki][EmacsWiki]]
 - [[#package-management][Package Management]]
   - [[#melpa][MELPA]]
   - [[#auto-updates][Auto-Updates]]
@@ -74,17 +72,6 @@
   - [[#yasnippet][YASnippet]]
 - [[#afterword][Afterword]]
 
-* Introduction
-Emacs is a *not* a text editor, it is a fully featured enviroment for Elisp code. It just happens to be able to edit text. As such, it allows for customization and extensibility far beyond the likes of VSCode and even Vim.
-
-However, one of the biggest downsides of emacs is it's steep learning curve, the language used to customize Emacs is difficult and it's syntax is quite strange. This makes Emacs quite daunting to new users, who'd rather stick with their limiting toolkit rather than spend weeks or months learning Emacs.
-
-This config aims to ease the transition for new users looking to join the Church of Emacs by changing the annoying features and adding the ones that most people looking to start using Emacs would want, while remaining lightweight and straightforward enough to not seem daunting to new users.
-
-But one of the best parts of this configuration for new users is the fact that it is written in Org Mode, the Markdown-like file format native to Emacs. This allows for detailed explanations for each tweak and package installed along with an easy way to navigate the file.
-
-** EmacsWiki
-The [[https://www.emacswiki.org/][EmacsWiki]] is one of the most useful sources for learning how to customize Emacs and it's many packages. If at any point you want to learn how to customize or add something, try looking there first.
 * Package Management
 ** MELPA
 MELPA is a package repository for Emacs that allows it to use the most popular Emacs packages. The following code will add it to Emacs. 
@@ -234,7 +221,7 @@ Typically prompts will ask for a yes or no answer, this is fine, but pressing y 
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 ** Create nonexistent files
-By default Emacs prompts you whenever you attempt to create a new file. It makes no sense though, so lets disable it.
+Create new files without having to confirm.
 
 #+begin_src emacs-lisp
 (setq confirm-nonexistent-file-or-buffer nil)
@@ -340,15 +327,18 @@ Package for vim like keybindings with leader keys.
      (general-create-definer vvgeneral/projectile-and-treemacs-keys
     :keymaps '(normal)
     :prefix "SPC")
+     (general-create-definer vvgeneral/M-x
+    :keymaps '(normal)
+    :prefix "SPC")
+     (general-create-definer vvgeneral/files
+    :keymaps '(normal)
+    :prefix "SPC")
      (general-create-definer vvgeneral/code-keys
     :keymaps '(normal)
     :prefix "SPC")
   )
 #+END_SRC
 *** Git Shortcuts
-General used with magit allows for operating extremely fast. The leader
-key for git operations in this configuration is SPC-g.
-
 #+begin_src emacs-lisp
   (vvgeneral/git-keys
     "g" '(:ignore t :which-key "git shortcuts")
@@ -365,9 +355,18 @@ key for git operations in this configuration is SPC-g.
     "gg" '(counsel-git-grep :which-key "counsel-git-grep")
   )
 #+END_SRC
-*** Buffer Shortcuts
-Buffer management in Emacs isn't really the most friendly out of the box. The keybindings are confusing and difficult to execute. Let's fix that with general leader keys.
+*** File Shortcuts
+Search, create, and manage files.
+#+begin_src emacs-lisp
+  (vvgeneral/files
+   "f" '(:ignore t :which-key "Files")
+   "ff" '(counsel-find-file :which-key "Find file")
+   "fR" '(rename-file :which-key "Rename file")
+   "fr" '(counsel-recentf :which-key "Recent files")
+   )
 
+#+end_src
+*** Buffer Shortcuts
 #+begin_src emacs-lisp
  (vvgeneral/buffer-keys
      "b" '(:ignore t :which-key "buffer shortcuts")
@@ -382,6 +381,13 @@ Buffer management in Emacs isn't really the most friendly out of the box. The ke
       "pp" '(treemacs :which-key "treemacs")
       "pr" '(projectile-command-map :which-key "projectile commands"))
 #+END_SRC
+***  Better ~M-x~
+Rebind ~M-x~ to ~SPC-SPC~
+#+begin_src emacs-lisp
+  (vvgeneral/M-x
+   "SPC" '(counsel-M-x :which-key "M-x"))
+#+end_src
+
 * helpful
 ~helpful~ gives better help menus and documentation in Emacs.
 
